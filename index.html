@@ -396,43 +396,50 @@
 
       <!-- RIGHT: Save/Load + Bass note -->
       <div class="panel">
-        <div class="side">
-          <div class="box">
-            <h3>Preset</h3>
-            <div class="row">
-              <div class="left">
-                <button id="btnSave" class="tiny primary">SAVE</button>
-                <button id="btnLoad" class="tiny">LOAD</button>
-                <button id="btnReset" class="tiny ghost">RESET</button>
-              </div>
-              <div class="left">
-                <span class="kbd">Space</span> Play/Pause
-              </div>
-            </div>
-            <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
-          </div>
+       <div class="side">
+  <div class="box">
+    <h3>Preset</h3>
 
-          <div class="box">
-            <h3>Bass</h3>
-            <label style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">
-              Nota
-            </label>
-            <select id="bassNote">
-              <option value="55">A1 (55Hz)</option>
-              <option value="61.735">B1 (61.7Hz)</option>
-              <option value="65.406">C2 (65.4Hz)</option>
-              <option value="73.416">D2 (73.4Hz)</option>
-              <option value="82.407" selected>E2 (82.4Hz)</option>
-              <option value="98">G2 (98Hz)</option>
-              <option value="110">A2 (110Hz)</option>
-            </select>
-            <div class="smallNote">
-              Bass mono “una nota” pensata per minimal: cambia la nota e crea pattern ipnotici.
-            </div>
-          </div>
+    <div class="row">
+      <div class="left">
+        <button type="button" id="btnSave" class="tiny primary" aria-label="Save preset">SAVE</button>
+        <button type="button" id="btnLoad" class="tiny" aria-label="Load preset">LOAD</button>
+        <button type="button" id="btnReset" class="tiny ghost" aria-label="Reset preset">RESET</button>
+      </div>
 
-          <div class="box">
-            <h3>About</h3>
+      <div class="left">
+        <span class="kbd" title="Keyboard shortcut">Space</span>
+        <span style="color:var(--muted); font-size:12px;">Play/Pause</span>
+      </div>
+    </div>
+
+    <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
+  </div>
+
+  <div class="box">
+    <h3>Bass</h3>
+
+    <label for="bassNote" style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">
+      Nota
+    </label>
+
+    <select id="bassNote" aria-label="Bass note selection">
+      <option value="55">A1 (55Hz)</option>
+      <option value="61.735">B1 (61.7Hz)</option>
+      <option value="65.406">C2 (65.4Hz)</option>
+      <option value="73.416">D2 (73.4Hz)</option>
+      <option value="82.407" selected>E2 (82.4Hz)</option>
+      <option value="98">G2 (98Hz)</option>
+      <option value="110">A2 (110Hz)</option>
+    </select>
+
+    <div class="smallNote">
+      Bass mono "una nota" pensata per minimal: cambia la nota e crea pattern ipnotici.
+    </div>
+  </div>
+
+  <div class="box" id="aboutBox">
+    <h3>About</h3>
             <div class="smallNote">
               Prototype by PezzaliAPP • WebAudio • GitHub Pages ready.<br/>
               Prossimo step: FX (filter/stutter) + export WAV.
@@ -531,6 +538,150 @@
   const presetStatus = document.getElementById("presetStatus");
 
   const bassNoteSel = document.getElementById("bassNote");
+
+  // ---------- FX + Bass UI (SAFE INIT) ----------
+const bassNoteSel = document.getElementById("bassNote");
+
+const btnHoldFx   = document.getElementById("btnHoldFx");
+const btnFxReset  = document.getElementById("btnFxReset");
+const fxPad       = document.getElementById("fxPad");
+const fxDot       = document.getElementById("fxDot");
+const fxReadout   = document.getElementById("fxReadout");
+
+let holdFx = false;
+let fxX = 0.5; // 0..1 (filter)
+let fxY = 0.0; // 0..1 (stutter intensity)
+
+let stutterTimer = null;
+let stutterCurrentHz = 0;
+
+// ----- Bass selector -----
+if (bassNoteSel) {
+  bassNoteSel.addEventListener("change", () => {
+    bassHz = Number(bassNoteSel.value) || bassHz;
+  });
+}
+
+// ----- FX helpers -----
+function setFxDotSafe(){
+  if (!fxPad || !fxDot) return;
+  fxDot.style.left = (fxX * 100) + "%";
+  fxDot.style.top  = ((1 - fxY) * 100) + "%";
+}
+
+function fxFilterFreqFromX(x){
+  const min = 200, max = 18000;
+  const t = Math.max(0, Math.min(1, x));
+  const k = Math.pow(t, 2.2);
+  return min + (max - min) * k;
+}
+
+function stopStutterSafe(){
+  const fx = window.__PG_FX__;
+  if (fx) {
+    fx.stutterGain.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.01);
+  }
+  if (stutterTimer) {
+    clearInterval(stutterTimer);
+    stutterTimer = null;
+  }
+  stutterCurrentHz = 0;
+}
+
+function startStutterSafe(rateHz){
+  const fx = window.__PG_FX__;
+  if (!fx) return;
+
+  const hz = Math.max(2, Math.min(30, rateHz));
+  if (stutterTimer && Math.abs(hz - stutterCurrentHz) < 0.5) return;
+
+  stopStutterSafe();
+  stutterCurrentHz = hz;
+
+  let on = true;
+  stutterTimer = setInterval(() => {
+    fx.stutterGain.gain.setTargetAtTime(on ? 1.0 : 0.0, audioCtx.currentTime, 0.002);
+    on = !on;
+  }, Math.max(25, 1000 / hz));
+}
+
+function updateFxSafe(){
+  const fx = window.__PG_FX__;
+  if (!fx || !started) return;
+
+  const freq = fxFilterFreqFromX(fxX);
+  fx.filter.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.01);
+
+  if (fxY < 0.05) {
+    stopStutterSafe();
+    fxReadout && (fxReadout.textContent =
+      `Filter: ${Math.round(fxX * 100)}% • Stutter: Off`);
+  } else {
+    const rateHz = 2 + fxY * 18;
+    startStutterSafe(rateHz);
+    fxReadout && (fxReadout.textContent =
+      `Filter: ${Math.round(fxX * 100)}% • Stutter: ${Math.round(rateHz)} Hz`);
+  }
+
+  setFxDotSafe();
+}
+
+function setFxFromPointerSafe(clientX, clientY){
+  if (!fxPad) return;
+  const r = fxPad.getBoundingClientRect();
+  fxX = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+  fxY = Math.max(0, Math.min(1, 1 - (clientY - r.top) / r.height));
+}
+
+// ----- FX Pad events -----
+if (fxPad && btnHoldFx && btnFxReset) {
+
+  fxPad.addEventListener("pointerdown", (e) => {
+    if (!started) {
+      presetStatus.textContent = "Tocca START AUDIO prima.";
+      return;
+    }
+    fxPad.setPointerCapture(e.pointerId);
+    holdFx = true;
+    btnHoldFx.classList.add("toggleOn");
+    setFxFromPointerSafe(e.clientX, e.clientY);
+    updateFxSafe();
+  });
+
+  fxPad.addEventListener("pointermove", (e) => {
+    if (!holdFx) return;
+    setFxFromPointerSafe(e.clientX, e.clientY);
+    updateFxSafe();
+  });
+
+  fxPad.addEventListener("pointerup", () => {
+    holdFx = false;
+    btnHoldFx.classList.remove("toggleOn");
+    stopStutterSafe();
+    fxReadout && (fxReadout.textContent =
+      `Filter: ${Math.round(fxX * 100)}% • Stutter: Off`);
+  });
+
+  btnHoldFx.addEventListener("click", () => {
+    if (!started) {
+      presetStatus.textContent = "Tocca START AUDIO prima.";
+      return;
+    }
+    holdFx = !holdFx;
+    btnHoldFx.classList.toggle("toggleOn", holdFx);
+    holdFx ? updateFxSafe() : stopStutterSafe();
+  });
+
+  btnFxReset.addEventListener("click", () => {
+    fxX = 0.5;
+    fxY = 0.0;
+    stopStutterSafe();
+    updateFxSafe();
+    fxReadout && (fxReadout.textContent = "Filter: 50% • Stutter: Off");
+  });
+
+  setFxDotSafe();
+}
 
   // ---------- Build UI ----------
   function buildTracksUI(){
