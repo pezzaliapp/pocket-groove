@@ -31,3 +31,34 @@ Da terminale nella cartella del progetto:
 **Python**
 ```bash
 python3 -m http.server 8080
+
+Poi apri:
+	•	http://localhost:8080
+
+Uso
+	1.	Premi START AUDIO
+	2.	Premi PLAY
+	3.	Tocca gli step per attivare/disattivare eventi
+	4.	Per campionare:
+	•	ARM MIC → autorizza microfono
+	•	REC → registra un suono
+	•	STOP → USE AS SAMPLE
+	•	Attiva step sulla traccia SAMPLE
+	5.	Per esportare:
+	•	Record WAV → REC → STOP → SAVE WAV
+
+Roadmap (idee)
+	•	PWA offline-ready (service worker + manifest)
+	•	Libreria di preset e sample pack
+	•	Export pattern (JSON) / import pattern
+	•	Waveform view per sample + slice
+
+Licenza
+
+Questo progetto è proprietario e non open source.
+Vedi il file LICENSE￼: vietata copia, modifica, distribuzione e riuso, salvo autorizzazione scritta dell’autore.
+
+Autore
+
+PezzaliAPP
+Repository: pocket-groove
