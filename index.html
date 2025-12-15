@@ -41,10 +41,9 @@
       justify-content:space-between;
       gap:12px;
       margin-bottom:12px;
+      flex-wrap:wrap;
     }
-    .brand{
-      display:flex; align-items:baseline; gap:10px;
-    }
+    .brand{ display:flex; align-items:baseline; gap:10px; }
     .brand h1{
       margin:0;
       font-size:18px;
@@ -133,9 +132,7 @@
     @media (max-width: 560px){
       .controls{ grid-template-columns:1fr; }
     }
-    .btnRow{
-      display:flex; gap:10px; flex-wrap:wrap;
-    }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
     button{
       cursor:pointer;
       border:1px solid rgba(255,255,255,.10);
@@ -151,6 +148,7 @@
     }
     button:hover{ background: rgba(255,255,255,.06); }
     button:active{ transform: translateY(1px); }
+    button:disabled{ opacity:.45; cursor:not-allowed; }
     .primary{
       background: linear-gradient(180deg, rgba(74,163,255,.22), rgba(74,163,255,.08));
       border-color: rgba(74,163,255,.35);
@@ -159,9 +157,7 @@
       background: linear-gradient(180deg, rgba(255,90,106,.22), rgba(255,90,106,.08));
       border-color: rgba(255,90,106,.35);
     }
-    .ghost{
-      background: rgba(0,0,0,.18);
-    }
+    .ghost{ background: rgba(0,0,0,.18); }
     .tiny{
       padding:8px 10px;
       font-size:12px;
@@ -180,6 +176,7 @@
       background: rgba(0,0,0,.18);
       border-radius: 16px;
       padding:10px 12px;
+      margin-top:10px;
     }
     .field label{
       display:flex; align-items:center; justify-content:space-between;
@@ -250,6 +247,7 @@
     .step.on.sn{ background: rgba(255,211,106,.20); border-color: rgba(255,211,106,.40); }
     .step.on.hh{ background: rgba(85,255,154,.18); border-color: rgba(85,255,154,.38); }
     .step.on.bs{ background: rgba(255,90,106,.18); border-color: rgba(255,90,106,.38); }
+
     .step.playhead::after{
       content:"";
       position:absolute; inset:0;
@@ -282,7 +280,7 @@
       align-items:center;
       justify-content:space-between;
     }
-    .row .left{ display:flex; gap:8px; flex-wrap:wrap; }
+    .row .left{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     select{
       width:100%;
       padding:10px 12px;
@@ -316,7 +314,7 @@
     <div class="topbar">
       <div class="brand">
         <h1>Pocket Groove</h1>
-        <span class="tag">16-step • WebAudio • PWA prototype</span>
+        <span class="tag">16-step • WebAudio • Sampler + WAV export</span>
       </div>
       <div class="btnRow">
         <button id="btnStartAudio" class="primary" type="button">START AUDIO</button>
@@ -343,7 +341,7 @@
         </div>
 
         <div class="controls">
-          <div class="field">
+          <div class="field" style="margin-top:0;">
             <label>
               <span>Tempo</span>
               <span><span class="kbd" id="bpmVal">120</span></span>
@@ -352,7 +350,7 @@
           </div>
 
           <div class="sliders">
-            <div class="field">
+            <div class="field" style="margin-top:0;">
               <label>
                 <span>Swing</span>
                 <span><span class="kbd" id="swingVal">0%</span></span>
@@ -375,10 +373,11 @@
           </div>
         </div>
       </div>
-            <!-- RIGHT: Preset + Record + FX + Bass -->
+            <!-- RIGHT -->
       <div class="panel">
         <div class="side">
 
+          <!-- PRESET -->
           <div class="box">
             <h3>Preset</h3>
             <div class="row">
@@ -395,6 +394,7 @@
             <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
           </div>
 
+          <!-- RECORD WAV -->
           <div class="box">
             <h3>Record WAV</h3>
             <div class="row">
@@ -407,13 +407,13 @@
                 <span class="kbd" id="recTimer">00:00</span>
               </div>
             </div>
-            <div class="smallNote" id="recStatus">Pronto. Premi REC per registrare la performance.</div>
+            <div class="smallNote" id="recStatus">Pronto. Premi REC per registrare l'output.</div>
             <a id="wavDownload" style="display:none;"></a>
           </div>
 
+          <!-- FX -->
           <div class="box">
             <h3>FX</h3>
-
             <div class="row">
               <div class="left">
                 <button id="btnHoldFx" class="tiny" type="button">HOLD FX</button>
@@ -444,6 +444,7 @@
             <div class="smallNote" id="fxReadout">Filter: 50% • Stutter: Off</div>
           </div>
 
+          <!-- BASS -->
           <div class="box">
             <h3>Bass</h3>
             <label for="bassNote" style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">Nota</label>
@@ -461,11 +462,63 @@
             </div>
           </div>
 
+          <!-- SAMPLER MIC -->
+          <div class="box">
+            <h3>Sampler (Mic)</h3>
+
+            <div class="row">
+              <div class="left">
+                <button id="btnMicArm" class="tiny" type="button">ARM MIC</button>
+                <button id="btnMicRec" class="tiny primary" type="button" disabled>REC</button>
+                <button id="btnMicStop" class="tiny danger" type="button" disabled>STOP</button>
+              </div>
+              <div class="left">
+                <span class="kbd" id="micTimer">00:00</span>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+              <div class="left">
+                <button id="btnUseSample" class="tiny" type="button" disabled>USE AS SAMPLE</button>
+                <button id="btnClearSample" class="tiny ghost" type="button" disabled>CLEAR</button>
+              </div>
+              <div class="left">
+                <label style="display:flex; gap:8px; align-items:center; color:var(--muted); font-size:12px;">
+                  <input id="chkMonitor" type="checkbox" />
+                  Monitor
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label><span>Start Trim</span><span><span class="kbd" id="trimVal">0%</span></span></label>
+              <input id="trimStart" type="range" min="0" max="80" value="0" />
+            </div>
+
+            <div class="field">
+              <label><span>Pitch</span><span><span class="kbd" id="pitchVal">0 st</span></span></label>
+              <input id="pitchSemi" type="range" min="-12" max="12" value="0" />
+            </div>
+
+            <div class="field">
+              <label><span>Filter</span><span><span class="kbd" id="filtVal">100%</span></span></label>
+              <input id="sampleFilter" type="range" min="0" max="100" value="100" />
+            </div>
+
+            <div class="field">
+              <label><span>Decay</span><span><span class="kbd" id="decayVal">120 ms</span></span></label>
+              <input id="sampleDecay" type="range" min="40" max="600" value="120" />
+            </div>
+
+            <div class="smallNote" id="micStatus">Premi ARM MIC (permesso microfono), registra, poi USE AS SAMPLE.</div>
+          </div>
+
+          <!-- ABOUT -->
           <div class="box">
             <h3>About</h3>
             <div class="smallNote">
               Prototype by PezzaliAPP • WebAudio • GitHub Pages ready.<br/>
-              FX + Export WAV inclusi.
+              Funzioni: FX XY, Sampler Mic, Export WAV.
             </div>
           </div>
 
@@ -483,22 +536,36 @@
 
   // ---------- State ----------
   const TRACKS = [
-    { id:"kick",  name:"KICK",  cls:""   },
-    { id:"snare", name:"SNARE", cls:"sn" },
-    { id:"hat",   name:"HAT",   cls:"hh" },
-    { id:"bass",  name:"BASS",  cls:"bs" },
+    { id:"kick",   name:"KICK",   cls:""   },
+    { id:"snare",  name:"SNARE",  cls:"sn" },
+    { id:"hat",    name:"HAT",    cls:"hh" },
+    { id:"bass",   name:"BASS",   cls:"bs" },
+    { id:"sample", name:"SAMPLE", cls:""   },
   ];
 
   let pattern = {
-    A: { kick:new Array(16).fill(false), snare:new Array(16).fill(false), hat:new Array(16).fill(false), bass:new Array(16).fill(false) },
-    B: { kick:new Array(16).fill(false), snare:new Array(16).fill(false), hat:new Array(16).fill(false), bass:new Array(16).fill(false) }
+    A: {
+      kick:   new Array(16).fill(false),
+      snare:  new Array(16).fill(false),
+      hat:    new Array(16).fill(false),
+      bass:   new Array(16).fill(false),
+      sample: new Array(16).fill(false),
+    },
+    B: {
+      kick:   new Array(16).fill(false),
+      snare:  new Array(16).fill(false),
+      hat:    new Array(16).fill(false),
+      bass:   new Array(16).fill(false),
+      sample: new Array(16).fill(false),
+    }
   };
 
-  // starter groove
+  // starter groove (sample vuoto)
   pattern.A.kick  = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0].map(Boolean);
   pattern.A.snare = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0].map(Boolean);
   pattern.A.hat   = [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1].map(Boolean);
   pattern.A.bass  = [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0].map(Boolean);
+  pattern.A.sample= new Array(16).fill(false);
 
   let currentPat = "A";
   let stepIndex = 0;
@@ -520,7 +587,7 @@
   let analyser = null;
   let started = false;
 
-  // bass
+  // bass note
   let bassHz = 82.407;
 
   // ---------- UI refs ----------
@@ -552,37 +619,35 @@
 
   const bassNoteSel = document.getElementById("bassNote");
 
-  // FX refs
-  const btnHoldFx = document.getElementById("btnHoldFx");
-  const btnFxReset = document.getElementById("btnFxReset");
-  const fxPad = document.getElementById("fxPad");
-  const fxDot = document.getElementById("fxDot");
-  const fxReadout = document.getElementById("fxReadout");
-
-  // Recorder refs
+  // Record WAV refs
   const btnRec = document.getElementById("btnRec");
   const btnRecStop = document.getElementById("btnRecStop");
   const btnRecSave = document.getElementById("btnRecSave");
   const recStatus = document.getElementById("recStatus");
   const recTimer = document.getElementById("recTimer");
   const wavDownload = document.getElementById("wavDownload");
-
-  // ---------- Bass selector ----------
+    // ---------- Bass selector ----------
   if (bassNoteSel) {
     bassNoteSel.addEventListener("change", () => {
       bassHz = Number(bassNoteSel.value) || bassHz;
     });
   }
 
-  // ---------- FX state ----------
+  // ---------- FX refs ----------
+  const btnHoldFx = document.getElementById("btnHoldFx");
+  const btnFxReset = document.getElementById("btnFxReset");
+  const fxPad = document.getElementById("fxPad");
+  const fxDot = document.getElementById("fxDot");
+  const fxReadout = document.getElementById("fxReadout");
+
   let holdFx = false;
-  let fxX = 0.5; // filter
-  let fxY = 0.0; // stutter
+  let fxX = 0.5; // 0..1 (filter)
+  let fxY = 0.0; // 0..1 (stutter)
   let stutterTimer = null;
   let stutterCurrentHz = 0;
 
   function setFxDot(){
-    if(!fxPad || !fxDot) return;
+    if (!fxPad || !fxDot) return;
     fxDot.style.left = (fxX * 100) + "%";
     fxDot.style.top  = ((1 - fxY) * 100) + "%";
   }
@@ -625,33 +690,32 @@
 
   function updateFx(){
     const fx = window.__PG_FX__;
-    if(!fx || !started || !audioCtx) return;
+    if (!fx || !started || !audioCtx) return;
 
     const freq = fxFilterFreqFromX(fxX);
     fx.filter.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.01);
 
-    if(fxY < 0.05){
+    if (fxY < 0.05) {
       stopStutter();
-      if(fxReadout) fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`;
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`);
     } else {
       const rateHz = 2 + fxY * 18;
       startStutter(rateHz);
-      if(fxReadout) fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: ${Math.round(rateHz)} Hz`;
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: ${Math.round(rateHz)} Hz`);
     }
-
     setFxDot();
   }
 
   function setFxFromPointer(clientX, clientY){
-    if(!fxPad) return;
+    if (!fxPad) return;
     const r = fxPad.getBoundingClientRect();
     fxX = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
     fxY = Math.max(0, Math.min(1, 1 - (clientY - r.top) / r.height));
   }
 
-  if(fxPad && btnHoldFx && btnFxReset){
+  if (fxPad && btnHoldFx && btnFxReset) {
     fxPad.addEventListener("pointerdown", (e) => {
-      if(!started){ presetStatus.textContent = "Tocca START AUDIO prima."; return; }
+      if (!started) { presetStatus.textContent = "Tocca START AUDIO prima."; return; }
       fxPad.setPointerCapture(e.pointerId);
       holdFx = true;
       btnHoldFx.classList.add("toggleOn");
@@ -660,7 +724,7 @@
     });
 
     fxPad.addEventListener("pointermove", (e) => {
-      if(!holdFx) return;
+      if (!holdFx) return;
       setFxFromPointer(e.clientX, e.clientY);
       updateFx();
     });
@@ -669,15 +733,15 @@
       holdFx = false;
       btnHoldFx.classList.remove("toggleOn");
       stopStutter();
-      if(fxReadout) fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`;
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`);
       setFxDot();
     });
 
     btnHoldFx.addEventListener("click", () => {
-      if(!started){ presetStatus.textContent = "Tocca START AUDIO prima."; return; }
+      if (!started) { presetStatus.textContent = "Tocca START AUDIO prima."; return; }
       holdFx = !holdFx;
       btnHoldFx.classList.toggle("toggleOn", holdFx);
-      if(holdFx) updateFx();
+      if (holdFx) updateFx();
       else stopStutter();
     });
 
@@ -685,13 +749,56 @@
       fxX = 0.5; fxY = 0.0;
       stopStutter();
       updateFx();
-      if(fxReadout) fxReadout.textContent = "Filter: 50% • Stutter: Off";
+      fxReadout && (fxReadout.textContent = "Filter: 50% • Stutter: Off");
     });
 
     setFxDot();
   }
 
-  // ---------- WAV Recorder ----------
+  // ---------- Audio init + FX chain ----------
+  function ensureAudio(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:"interactive" });
+
+    master = audioCtx.createGain();
+    master.gain.value = 0.9;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 18000;
+    filter.Q.value = 0.7;
+
+    const stutterGain = audioCtx.createGain();
+    stutterGain.gain.value = 1.0;
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+
+    master.connect(filter);
+    filter.connect(stutterGain);
+    stutterGain.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    window.__PG_FX__ = { filter, stutterGain };
+    window.__PG_REC_SRC__ = stutterGain; // recorder tap (post-FX)
+
+    // update UI
+    setTimeout(() => updateFx(), 0);
+  }
+
+  async function startAudio(){
+    ensureAudio();
+    if(audioCtx.state !== "running"){
+      await audioCtx.resume();
+    }
+    started = true;
+    btnStartAudio.textContent = "AUDIO OK";
+    btnStartAudio.classList.add("toggleOn");
+    btnStartAudio.disabled = true;
+  }
+    // =========================
+  // Record WAV (output post-FX)
+  // =========================
   let recNode = null;
   let recZero = null;
   let recChunksL = [];
@@ -717,12 +824,12 @@
 
   function recorderInit(){
     if(!started || !audioCtx){
-      if(recStatus) recStatus.textContent = "Tocca START AUDIO prima.";
+      recStatus && (recStatus.textContent = "Tocca START AUDIO prima.");
       return false;
     }
     const src = window.__PG_REC_SRC__;
     if(!src){
-      if(recStatus) recStatus.textContent = "Sorgente REC non pronta.";
+      recStatus && (recStatus.textContent = "Sorgente REC non pronta.");
       return false;
     }
 
@@ -818,48 +925,48 @@
     return new Blob([view], { type:"audio/wav" });
   }
 
-  function recorderStart(){
+  function recStart(){
     if(recRunning) return;
     if(!recorderInit()) return;
 
     recRunning = true;
     recStartTs = performance.now();
-    if(recTimer) recTimer.textContent = "00:00";
+    recTimer && (recTimer.textContent = "00:00");
     recTimerId = setInterval(updateRecTimer, 250);
 
-    if(btnRec) btnRec.disabled = true;
-    if(btnRecStop) btnRecStop.disabled = false;
-    if(btnRecSave) btnRecSave.disabled = true;
-    if(recStatus) recStatus.textContent = "REC in corso… suona e usa gli FX.";
-    if(wavDownload) wavDownload.style.display = "none";
+    btnRec && (btnRec.disabled = true);
+    btnRecStop && (btnRecStop.disabled = false);
+    btnRecSave && (btnRecSave.disabled = true);
+    wavDownload && (wavDownload.style.display = "none");
+
+    recStatus && (recStatus.textContent = "REC in corso… registra l'output (post-FX).");
   }
 
-  function recorderStop(){
+  function recStop(){
     if(!recRunning) return;
     recRunning = false;
 
     if(recTimerId){ clearInterval(recTimerId); recTimerId = null; }
     updateRecTimer();
 
-    // disconnect tap
     try{
       const src = window.__PG_REC_SRC__;
       if(src && recNode) src.disconnect(recNode);
     }catch{}
 
-    try{ if(recNode) recNode.disconnect(); }catch{}
-    try{ if(recZero) recZero.disconnect(); }catch{}
+    try{ recNode && recNode.disconnect(); }catch{}
+    try{ recZero && recZero.disconnect(); }catch{}
     recNode = null;
     recZero = null;
 
-    if(btnRec) btnRec.disabled = false;
-    if(btnRecStop) btnRecStop.disabled = true;
-    if(btnRecSave) btnRecSave.disabled = (recLength === 0);
+    btnRec && (btnRec.disabled = false);
+    btnRecStop && (btnRecStop.disabled = true);
+    btnRecSave && (btnRecSave.disabled = (recLength === 0));
 
-    if(recStatus) recStatus.textContent = recLength ? "STOP. Premi SAVE WAV per esportare." : "STOP. Nessun audio registrato.";
+    recStatus && (recStatus.textContent = recLength ? "STOP. Premi SAVE WAV." : "STOP. Nessun audio registrato.");
   }
 
-  function recorderSave(){
+  function recSave(){
     if(recLength === 0) return;
 
     const left = mergeFloat32(recChunksL, recLength);
@@ -878,12 +985,269 @@
       wavDownload.textContent = "Download WAV";
       wavDownload.style.display = "inline-block";
     }
-    if(recStatus) recStatus.textContent = "WAV pronto. Premi Download WAV.";
+    recStatus && (recStatus.textContent = "WAV pronto. Premi Download WAV.");
   }
 
-  if(btnRec) btnRec.addEventListener("click", recorderStart);
-  if(btnRecStop) btnRecStop.addEventListener("click", recorderStop);
-  if(btnRecSave) btnRecSave.addEventListener("click", recorderSave);
+  btnRec && btnRec.addEventListener("click", recStart);
+  btnRecStop && btnRecStop.addEventListener("click", recStop);
+  btnRecSave && btnRecSave.addEventListener("click", recSave);
+    // =====================
+  // Sampler (Mic) - 1 slot
+  // =====================
+  const btnMicArm   = document.getElementById("btnMicArm");
+  const btnMicRec   = document.getElementById("btnMicRec");
+  const btnMicStop  = document.getElementById("btnMicStop");
+  const btnUseSample= document.getElementById("btnUseSample");
+  const btnClearSample = document.getElementById("btnClearSample");
+  const micStatus   = document.getElementById("micStatus");
+  const micTimer    = document.getElementById("micTimer");
+  const chkMonitor  = document.getElementById("chkMonitor");
+
+  const trimStartEl = document.getElementById("trimStart");
+  const pitchSemiEl = document.getElementById("pitchSemi");
+  const sampleFilterEl = document.getElementById("sampleFilter");
+  const sampleDecayEl  = document.getElementById("sampleDecay");
+  const trimVal = document.getElementById("trimVal");
+  const pitchVal = document.getElementById("pitchVal");
+  const filtVal  = document.getElementById("filtVal");
+  const decayVal = document.getElementById("decayVal");
+
+  let micStream = null;
+  let micSrc = null;
+  let micWorklet = null;
+  let micMonitorGain = null;
+
+  let micArmed = false;
+  let micRecording = false;
+  let micStartTs = 0;
+  let micTimerId = null;
+
+  // recorded PCM mono
+  let micRecChunks = [];
+  let micRecLen = 0;
+  let micRecSampleRate = 44100;
+
+  // sample slot
+  let sampleBuf = null;
+  let sampleReady = false;
+
+  // sample params
+  let trimStartPct = 0;        // 0..0.8
+  let pitchSemi = 0;           // -12..12
+  let sampleFilterPct = 1.0;   // 0..1
+  let sampleDecayMs = 120;
+
+  function mmss(sec){
+    sec = Math.max(0, Math.floor(sec));
+    const m = String(Math.floor(sec/60)).padStart(2,"0");
+    const s = String(sec%60).padStart(2,"0");
+    return `${m}:${s}`;
+  }
+
+  function setSamplerUIState(){
+    btnMicArm && btnMicArm.classList.toggle("toggleOn", micArmed);
+    btnMicRec && (btnMicRec.disabled = !micArmed || micRecording);
+    btnMicStop && (btnMicStop.disabled = !micRecording);
+    btnUseSample && (btnUseSample.disabled = (micRecLen === 0) || micRecording);
+    btnClearSample && (btnClearSample.disabled = !sampleReady);
+  }
+
+  function updateSamplerLabels(){
+    trimVal && (trimVal.textContent = `${Math.round(trimStartPct*100)}%`);
+    pitchVal && (pitchVal.textContent = `${pitchSemi} st`);
+    filtVal  && (filtVal.textContent  = `${Math.round(sampleFilterPct*100)}%`);
+    decayVal && (decayVal.textContent = `${sampleDecayMs} ms`);
+  }
+
+  trimStartEl?.addEventListener("input", () => {
+    trimStartPct = (Number(trimStartEl.value) || 0) / 100;
+    updateSamplerLabels();
+  });
+  pitchSemiEl?.addEventListener("input", () => {
+    pitchSemi = Number(pitchSemiEl.value) || 0;
+    updateSamplerLabels();
+  });
+  sampleFilterEl?.addEventListener("input", () => {
+    sampleFilterPct = (Number(sampleFilterEl.value) || 100) / 100;
+    updateSamplerLabels();
+  });
+  sampleDecayEl?.addEventListener("input", () => {
+    sampleDecayMs = Number(sampleDecayEl.value) || 120;
+    updateSamplerLabels();
+  });
+  updateSamplerLabels();
+
+  async function ensureMicWorklet(){
+    ensureAudio();
+    if(!audioCtx) return;
+
+    // Create AudioWorkletProcessor from Blob (single file)
+    const code = `
+      class MicTapProcessor extends AudioWorkletProcessor {
+        process(inputs) {
+          const input = inputs[0];
+          if (input && input[0]) {
+            this.port.postMessage(input[0]);
+          }
+          return true;
+        }
+      }
+      registerProcessor('mic-tap', MicTapProcessor);
+    `;
+    const blob = new Blob([code], { type:"application/javascript" });
+    const url = URL.createObjectURL(blob);
+    await audioCtx.audioWorklet.addModule(url);
+    URL.revokeObjectURL(url);
+  }
+
+  async function armMic(){
+    try{
+      await startAudio(); // must be user gesture
+
+      if(!navigator.mediaDevices?.getUserMedia){
+        micStatus && (micStatus.textContent = "getUserMedia non disponibile su questo browser.");
+        return;
+      }
+
+      if(!micStream){
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: false
+          }
+        });
+      }
+
+      await ensureMicWorklet();
+
+      micSrc = audioCtx.createMediaStreamSource(micStream);
+      micWorklet = new AudioWorkletNode(audioCtx, "mic-tap", { numberOfInputs:1, numberOfOutputs:0 });
+
+      micMonitorGain = audioCtx.createGain();
+      micMonitorGain.gain.value = 0.0;
+
+      micWorklet.port.onmessage = (e) => {
+        if(!micRecording) return;
+        const chunk = e.data; // Float32Array
+        micRecChunks.push(new Float32Array(chunk));
+        micRecLen += chunk.length;
+      };
+
+      micSrc.connect(micWorklet);
+
+      // optional monitor into master (post-synth, pre-FX)
+      micSrc.connect(micMonitorGain);
+      micMonitorGain.connect(master);
+
+      chkMonitor && chkMonitor.addEventListener("change", () => {
+        micMonitorGain.gain.value = chkMonitor.checked ? 0.8 : 0.0;
+      });
+
+      micRecSampleRate = audioCtx.sampleRate;
+      micArmed = true;
+      micStatus && (micStatus.textContent = "Mic pronto. Premi REC (consigliato: 1–5 secondi).");
+      setSamplerUIState();
+    }catch(err){
+      console.error(err);
+      micArmed = false;
+      micStatus && (micStatus.textContent = "Permesso microfono negato o errore.");
+      setSamplerUIState();
+    }
+  }
+
+  function micRecStart(){
+    if(!micArmed || micRecording) return;
+    micRecChunks = [];
+    micRecLen = 0;
+    micRecording = true;
+    micStartTs = performance.now();
+    micTimer && (micTimer.textContent = "00:00");
+    micTimerId = setInterval(() => {
+      micTimer && (micTimer.textContent = mmss((performance.now()-micStartTs)/1000));
+    }, 200);
+
+    micStatus && (micStatus.textContent = "REC… fai un suono/voce, poi STOP.");
+    setSamplerUIState();
+  }
+
+  function micRecStop(){
+    if(!micRecording) return;
+    micRecording = false;
+    if(micTimerId){ clearInterval(micTimerId); micTimerId = null; }
+    micStatus && (micStatus.textContent = micRecLen ? "STOP. Premi USE AS SAMPLE." : "STOP. Nessun audio registrato.");
+    setSamplerUIState();
+  }
+
+  function mergeMono(chunks, total){
+    const out = new Float32Array(total);
+    let off = 0;
+    for(const c of chunks){ out.set(c, off); off += c.length; }
+    return out;
+  }
+
+  function useAsSample(){
+    if(micRecLen === 0) return;
+    ensureAudio();
+
+    const mono = mergeMono(micRecChunks, micRecLen);
+    const buf = audioCtx.createBuffer(1, mono.length, micRecSampleRate);
+    buf.copyToChannel(mono, 0, 0);
+
+    sampleBuf = buf;
+    sampleReady = true;
+
+    micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva step sulla traccia SAMPLE.");
+    setSamplerUIState();
+  }
+
+  function clearSample(){
+    sampleBuf = null;
+    sampleReady = false;
+    micStatus && (micStatus.textContent = "Sample svuotato.");
+    setSamplerUIState();
+  }
+
+  function triggerSample(when){
+    if(!sampleReady || !sampleBuf || !audioCtx) return;
+
+    const src = audioCtx.createBufferSource();
+    src.buffer = sampleBuf;
+
+    // pitch in semitones
+    const rate = Math.pow(2, pitchSemi / 12);
+    src.playbackRate.setValueAtTime(rate, when);
+
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.exponentialRampToValueAtTime(0.95, when + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + (sampleDecayMs/1000));
+
+    const f = audioCtx.createBiquadFilter();
+    f.type = "lowpass";
+    const minF = 300, maxF = 18000;
+    const cutoff = minF + (maxF - minF) * Math.pow(sampleFilterPct, 2.1);
+    f.frequency.setValueAtTime(cutoff, when);
+    f.Q.value = 0.8;
+
+    src.connect(f);
+    f.connect(g);
+    g.connect(master);
+
+    const startOffset = sampleBuf.duration * trimStartPct;
+    const maxDur = Math.min(2.0, Math.max(0.05, sampleBuf.duration - startOffset));
+
+    src.start(when, startOffset, maxDur);
+    src.stop(when + maxDur + 0.05);
+  }
+
+  btnMicArm?.addEventListener("click", armMic);
+  btnMicRec?.addEventListener("click", micRecStart);
+  btnMicStop?.addEventListener("click", micRecStop);
+  btnUseSample?.addEventListener("click", useAsSample);
+  btnClearSample?.addEventListener("click", clearSample);
+
+  setSamplerUIState();
     // ---------- Build UI ----------
   function buildTracksUI(){
     elTracks.innerHTML = "";
@@ -968,51 +1332,10 @@
     const pat = pattern[currentPat];
     pat[track][idx] = !pat[track][idx];
     renderSteps();
+
     if(started && pat[track][idx]){
       triggerTrack(track, audioCtx.currentTime + 0.005);
     }
-  }
-
-  // ---------- Audio init (FX chain + REC source) ----------
-  function ensureAudio(){
-    if(audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:"interactive" });
-
-    master = audioCtx.createGain();
-    master.gain.value = 0.9;
-
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 18000;
-    filter.Q.value = 0.7;
-
-    const stutterGain = audioCtx.createGain();
-    stutterGain.gain.value = 1.0;
-
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 1024;
-
-    master.connect(filter);
-    filter.connect(stutterGain);
-    stutterGain.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    window.__PG_FX__ = { filter, stutterGain };
-    window.__PG_REC_SRC__ = stutterGain;
-
-    // sync FX UI once audio is ready
-    setTimeout(() => updateFx(), 0);
-  }
-
-  async function startAudio(){
-    ensureAudio();
-    if(audioCtx.state !== "running"){
-      await audioCtx.resume();
-    }
-    started = true;
-    btnStartAudio.textContent = "AUDIO OK";
-    btnStartAudio.classList.add("toggleOn");
-    btnStartAudio.disabled = true;
   }
 
   // ---------- Sound generators ----------
@@ -1052,24 +1375,17 @@
     const o = audioCtx.createOscillator();
     o.type = "triangle";
     o.frequency.setValueAtTime(220, when);
-
     const og = audioCtx.createGain();
     og.gain.setValueAtTime(0.0001, when);
     og.gain.exponentialRampToValueAtTime(0.35, when + 0.004);
     og.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
 
-    n.connect(hp);
-    hp.connect(g);
-
-    o.connect(og);
-    og.connect(g);
-
+    n.connect(hp); hp.connect(g);
+    o.connect(og); og.connect(g);
     g.connect(master);
 
-    n.start(when);
-    n.stop(when + 0.16);
-    o.start(when);
-    o.stop(when + 0.12);
+    n.start(when); n.stop(when + 0.16);
+    o.start(when); o.stop(when + 0.12);
   }
 
   function triggerHat(when){
@@ -1087,9 +1403,7 @@
     g.gain.exponentialRampToValueAtTime(0.35, when + 0.002);
     g.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
 
-    n.connect(bp);
-    bp.connect(g);
-    g.connect(master);
+    n.connect(bp); bp.connect(g); g.connect(master);
 
     n.start(when);
     n.stop(when + 0.06);
@@ -1111,9 +1425,7 @@
     g.gain.exponentialRampToValueAtTime(0.55, when + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, when + 0.16);
 
-    o.connect(f);
-    f.connect(g);
-    g.connect(master);
+    o.connect(f); f.connect(g); g.connect(master);
 
     o.start(when);
     o.stop(when + 0.18);
@@ -1125,22 +1437,24 @@
     const length = audioCtx.sampleRate * 0.5;
     const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
-    for(let i=0;i<length;i++) data[i] = (Math.random()*2 - 1);
+    for(let i=0;i<length;i++) data[i] = (Math.random() * 2 - 1);
     _noiseBuffer = buffer;
     return buffer;
   }
 
   function triggerTrack(trackId, when){
     switch(trackId){
-      case "kick":  triggerKick(when); break;
-      case "snare": triggerSnare(when); break;
-      case "hat":   triggerHat(when); break;
-      case "bass":  triggerBass(when); break;
+      case "kick":   triggerKick(when); break;
+      case "snare":  triggerSnare(when); break;
+      case "hat":    triggerHat(when); break;
+      case "bass":   triggerBass(when); break;
+      case "sample": triggerSample(when); break;
     }
   }
 
   // ---------- Sequencer timing ----------
   function secondsPerStep(){ return 60.0 / bpm / 4.0; } // 16th
+
   function swingOffsetForStep(step){
     if(step % 2 === 1) return secondsPerStep() * swing;
     return 0;
@@ -1148,10 +1462,11 @@
 
   function scheduleStep(step, time){
     const pat = pattern[currentPat];
-    if(pat.kick[step])  triggerKick(time);
-    if(pat.snare[step]) triggerSnare(time);
-    if(pat.hat[step])   triggerHat(time);
-    if(pat.bass[step])  triggerBass(time);
+    if(pat.kick[step])   triggerKick(time);
+    if(pat.snare[step])  triggerSnare(time);
+    if(pat.hat[step])    triggerHat(time);
+    if(pat.bass[step])   triggerBass(time);
+    if(pat.sample[step]) triggerSample(time);
 
     const uiDelay = Math.max(0, (time - audioCtx.currentTime) * 1000);
     setTimeout(() => flashPlayhead(step), uiDelay);
@@ -1216,10 +1531,10 @@
   }
 
   // ---------- Preset save/load ----------
-  const LS_KEY = "pocket-groove-v01";
+  const LS_KEY = "pocket-groove-v02";
 
   function savePreset(){
-    const data = { pattern, currentPat, bpm, swing, bassHz };
+    const data = { pattern, currentPat, bpm, swing, bassHz, fxX, fxY, trimStartPct, pitchSemi, sampleFilterPct, sampleDecayMs };
     localStorage.setItem(LS_KEY, JSON.stringify(data));
     presetStatus.textContent = "Preset salvato in locale ✔";
   }
@@ -1235,12 +1550,31 @@
       if(typeof data.swing === "number") swing = data.swing;
       if(typeof data.bassHz === "number") bassHz = data.bassHz;
 
+      if(typeof data.fxX === "number") fxX = data.fxX;
+      if(typeof data.fxY === "number") fxY = data.fxY;
+
+      if(typeof data.trimStartPct === "number") trimStartPct = data.trimStartPct;
+      if(typeof data.pitchSemi === "number") pitchSemi = data.pitchSemi;
+      if(typeof data.sampleFilterPct === "number") sampleFilterPct = data.sampleFilterPct;
+      if(typeof data.sampleDecayMs === "number") sampleDecayMs = data.sampleDecayMs;
+
       bpmSlider.value = String(bpm);
       swingSlider.value = String(Math.round(swing * 100));
-      if(bassNoteSel) bassNoteSel.value = String(bassHz);
+      bassNoteSel.value = String(bassHz);
+
+      trimStartEl && (trimStartEl.value = String(Math.round(trimStartPct * 100)));
+      pitchSemiEl && (pitchSemiEl.value = String(pitchSemi));
+      sampleFilterEl && (sampleFilterEl.value = String(Math.round(sampleFilterPct * 100)));
+      sampleDecayEl && (sampleDecayEl.value = String(sampleDecayMs));
+      updateSamplerLabels();
 
       syncLCD();
       renderSteps();
+
+      // FX UI + audio
+      setFxDot();
+      if(started) updateFx();
+
       presetStatus.textContent = "Preset caricato ✔";
     }catch(e){
       presetStatus.textContent = "Errore nel preset.";
@@ -1267,13 +1601,15 @@
 
   function randomize(){
     const pat = pattern[currentPat];
-    pat.kick  = pat.kick.map((_,i) => (i%4===0) ? true : Math.random() < 0.10);
-    pat.snare = pat.snare.map((_,i) => (i===4||i===12) ? true : Math.random() < 0.06);
-    pat.hat   = pat.hat.map((_,i) => (i%2===1) ? (Math.random() < 0.85) : (Math.random() < 0.20));
-    pat.bass  = pat.bass.map(() => Math.random() < 0.22);
+    pat.kick   = pat.kick.map((_,i) => (i%4===0) ? true : Math.random() < 0.10);
+    pat.snare  = pat.snare.map((_,i) => (i===4||i===12) ? true : Math.random() < 0.06);
+    pat.hat    = pat.hat.map((_,i) => (i%2===1) ? (Math.random() < 0.85) : (Math.random() < 0.20));
+    pat.bass   = pat.bass.map(() => Math.random() < 0.22);
+    pat.sample = pat.sample.map(() => sampleReady ? (Math.random() < 0.10) : false);
     renderSteps();
   }
 
+  // ---------- LCD sync ----------
   function syncLCD(){
     lcdBpm.textContent = String(bpm);
     bpmVal.textContent = String(bpm);
