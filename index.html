@@ -394,31 +394,81 @@
         </div>
       </div>
 
-      <!-- RIGHT: Save/Load + Bass note -->
-      <div class="panel">
-       <div class="side">
-  <div class="box">
-    <h3>Preset</h3>
+<!-- RIGHT: Preset • Record • Bass -->
+<div class="panel">
+  <div class="side">
 
-    <div class="row">
-      <div class="left">
-        <button type="button" id="btnSave" class="tiny primary" aria-label="Save preset">SAVE</button>
-        <button type="button" id="btnLoad" class="tiny" aria-label="Load preset">LOAD</button>
-        <button type="button" id="btnReset" class="tiny ghost" aria-label="Reset preset">RESET</button>
+    <!-- PRESET -->
+    <div class="box">
+      <h3>Preset</h3>
+
+      <div class="row">
+        <div class="left">
+          <button type="button" id="btnSave" class="tiny primary" aria-label="Save preset">SAVE</button>
+          <button type="button" id="btnLoad" class="tiny" aria-label="Load preset">LOAD</button>
+          <button type="button" id="btnReset" class="tiny ghost" aria-label="Reset preset">RESET</button>
+        </div>
+
+        <div class="left">
+          <span class="kbd" title="Keyboard shortcut">Space</span>
+          <span style="color:var(--muted); font-size:12px;">Play / Pause</span>
+        </div>
       </div>
 
-      <div class="left">
-        <span class="kbd" title="Keyboard shortcut">Space</span>
-        <span style="color:var(--muted); font-size:12px;">Play/Pause</span>
+      <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
+    </div>
+
+    <!-- RECORD WAV -->
+    <div class="box">
+      <h3>Record WAV</h3>
+
+      <div class="row">
+        <div class="left">
+          <button type="button" id="btnRec" class="tiny primary">REC</button>
+          <button type="button" id="btnRecStop" class="tiny danger" disabled>STOP</button>
+          <button type="button" id="btnRecSave" class="tiny" disabled>SAVE WAV</button>
+        </div>
+
+        <div class="left">
+          <span class="kbd" id="recTimer">00:00</span>
+        </div>
+      </div>
+
+      <div class="smallNote" id="recStatus">
+        Pronto. Premi REC per registrare la performance.
+      </div>
+
+      <!-- hidden download anchor -->
+      <a id="wavDownload" style="display:none;"></a>
+    </div>
+
+    <!-- BASS -->
+    <div class="box">
+      <h3>Bass</h3>
+
+      <label for="bassNote"
+             style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">
+        Nota
+      </label>
+
+      <select id="bassNote" aria-label="Bass note selection">
+        <option value="55">A1 (55 Hz)</option>
+        <option value="61.735">B1 (61.7 Hz)</option>
+        <option value="65.406">C2 (65.4 Hz)</option>
+        <option value="73.416">D2 (73.4 Hz)</option>
+        <option value="82.407" selected>E2 (82.4 Hz)</option>
+        <option value="98">G2 (98 Hz)</option>
+        <option value="110">A2 (110 Hz)</option>
+      </select>
+
+      <div class="smallNote">
+        Bass mono "una nota" pensata per minimal:
+        cambia la nota e crea pattern ipnotici.
       </div>
     </div>
 
-    <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
   </div>
-
-  <div class="box">
-    <h3>Bass</h3>
-
+</div>
     <label for="bassNote" style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">
       Nota
     </label>
