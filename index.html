@@ -1390,41 +1390,72 @@
   }
 
   // ========= Events =========
-  btnStartAudio.addEventListener("click", async () => { await startAudio(); });
+btnStartAudio.addEventListener("click", async () => {
+  await startAudio();
+});
 
-  btnPlay.addEventListener("click", () => {
-    if(!started){ presetStatus.textContent = "Tocca START AUDIO prima (Safari iOS)."; return; }
-    togglePlay();
-  });
+btnPlay.addEventListener("click", () => {
+  if (!started) {
+    presetStatus.textContent = "Tocca START AUDIO prima (Safari iOS).";
+    return;
+  }
+  togglePlay();
+});
 
-  btnStop.addEventListener("click", () => stopSequencer());
+btnStop.addEventListener("click", stopSequencer);
 
-  bpmSlider.addEventListener("input", () => { bpm = Number(bpmSlider.value); syncLCD(); });
-  swingSlider.addEventListener("input", () => { swing = Number(swingSlider.value)/100; syncLCD(); });
-
-  btnPattern?.addEventListener("click", togglePattern);
-  btnClear?.addEventListener("click", () => { clearPattern(); presetStatus.textContent = "Clear ✔"; });
-  btnRandom?.addEventListener("click", randomize);
-  btnGroove?.addEventListener("click", nextGroove);
-
-  btnSave?.addEventListener("click", savePreset);
-  btnLoad?.addEventListener("click", loadPreset);
-  btnReset?.addEventListener("click", resetPreset);
-
-  window.addEventListener("keydown", (e) => {
-    if(e.code === "Space"){
-      e.preventDefault();
-      if(!started) return;
-      togglePlay();
-    }
-  }, { passive:false });
-
-  // ========= Init =========
-  buildTracksUI();
+bpmSlider.addEventListener("input", () => {
+  bpm = Number(bpmSlider.value);
   syncLCD();
-  if(localStorage.getItem(LS_KEY)) presetStatus.textContent = "Preset trovato: premi LOAD.";
-  meterLoop();
-  lcdStep.textContent = "1";
+});
+
+swingSlider.addEventListener("input", () => {
+  swing = Number(swingSlider.value) / 100;
+  syncLCD();
+});
+
+btnPattern?.addEventListener("click", togglePattern);
+
+btnClear?.addEventListener("click", () => {
+  clearPattern();
+  presetStatus.textContent = "Clear ✔";
+});
+
+btnRandom?.addEventListener("click", randomize);
+btnGroove?.addEventListener("click", nextGroove);
+
+btnSave?.addEventListener("click", savePreset);
+btnLoad?.addEventListener("click", loadPreset);
+btnReset?.addEventListener("click", resetPreset);
+
+window.addEventListener(
+  "keydown",
+  (e) => {
+    if (e.code !== "Space") return;
+    e.preventDefault();
+    if (!started) return;
+    togglePlay();
+  },
+  { passive: false }
+);
+
+// ========= Init =========
+buildTracksUI();
+syncLCD();
+if (localStorage.getItem(LS_KEY)) {
+  presetStatus.textContent = "Preset trovato: premi LOAD.";
+}
+meterLoop();
+lcdStep.textContent = "1";
+
+// ========= PWA: Service Worker =========
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .catch((err) => console.error("SW register failed:", err));
+  });
+}
 })();
 </script>
 </body>
