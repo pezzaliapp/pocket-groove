@@ -1200,11 +1200,32 @@
     if(micRecLen === 0) return;
     ensureAudio();
 
-    const mono = mergeMono(micRecChunks, micRecLen);
-    const buf = audioCtx.createBuffer(1, mono.length, micRecSampleRate);
-    buf.copyToChannel(mono, 0, 0);
+    function useAsSample(){
+  if(micRecLen === 0) return;
+  ensureAudio();
 
-    sampleBuf = buf;
+  const mono = mergeMono(micRecChunks, micRecLen);
+
+  // 🔥 NORMALIZE
+  let peak = 0;
+  for(let i=0;i<mono.length;i++){
+    const a = Math.abs(mono[i]);
+    if(a > peak) peak = a;
+  }
+  const gain = peak > 0 ? 0.95 / peak : 1;
+  for(let i=0;i<mono.length;i++){
+    mono[i] *= gain;
+  }
+
+  const buf = audioCtx.createBuffer(1, mono.length, micRecSampleRate);
+  buf.copyToChannel(mono, 0, 0);
+
+  sampleBuf = buf;
+  sampleReady = true;
+
+  micStatus.textContent = "Sample caricato ✔ (normalizzato)";
+  setSamplerUIState();
+}
     sampleReady = true;
 
     micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva step sulla traccia SAMPLE.");
