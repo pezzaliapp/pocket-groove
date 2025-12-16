@@ -1080,36 +1080,43 @@
     sampleDecayMs = Number(sampleDecayEl.value) || 120;
     updateSamplerLabels();
   });
-  updateSamplerLabels();
+let micWorkletLoaded = false;
 
-  async function ensureMicWorklet(){
-    ensureAudio();
-    if(!audioCtx) return;
+updateSamplerLabels();
 
-    const code = `
-      class MicTapProcessor extends AudioWorkletProcessor {
-        process(inputs) {
-          const input = inputs[0];
-          if (input && input[0]) {
-            this.port.postMessage(input[0]);
-          }
-          return true;
+async function ensureMicWorklet(){
+  if (micWorkletLoaded) return;   // ⬅️ evita ricarichi multipli
+
+  ensureAudio();
+  if (!audioCtx) return;
+
+  const code = `
+    class MicTapProcessor extends AudioWorkletProcessor {
+      process(inputs) {
+        const input = inputs[0];
+        if (input && input[0]) {
+          this.port.postMessage(input[0]);
         }
+        return true;
       }
-      registerProcessor('mic-tap', MicTapProcessor);
-    `;
-    const blob = new Blob([code], { type:"application/javascript" });
-    const url = URL.createObjectURL(blob);
-    await audioCtx.audioWorklet.addModule(url);
-    URL.revokeObjectURL(url);
-  }
+    }
+    registerProcessor('mic-tap', MicTapProcessor);
+  `;
 
-  let monitorListenerBound = false;
+  const blob = new Blob([code], { type: "application/javascript" });
+  const url = URL.createObjectURL(blob);
 
-  async function armMic(){
-    try{
-      await startAudio(); // must be user gesture
+  await audioCtx.audioWorklet.addModule(url);
+  URL.revokeObjectURL(url);
 
+  micWorkletLoaded = true;        // ⬅️ segna come caricato
+}
+
+let monitorListenerBound = false;
+
+async function armMic(){
+  try{
+    await startAudio(); // must be user gesture
       if(!navigator.mediaDevices?.getUserMedia){
         micStatus && (micStatus.textContent = "getUserMedia non disponibile su questo browser.");
         return;
