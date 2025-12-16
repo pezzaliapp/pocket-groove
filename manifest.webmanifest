@@ -1,0 +1,29 @@
+{
+  "name": "Pocket Groove",
+  "short_name": "PocketGroove",
+  "description": "Single-file browser groovebox & 16-step sequencer built with Web Audio API.",
+  "start_url": "/pocket-groove/",
+  "scope": "/pocket-groove/",
+  "display": "standalone",
+  "background_color": "#0b0f14",
+  "theme_color": "#0b0f14",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
