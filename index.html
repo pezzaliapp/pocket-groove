@@ -1,155 +1,320 @@
 <!doctype html>
 <html lang="it">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Pocket Groove</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pocket Groove</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#12141b;
+      --panel2:#0f1117;
+      --line:#2a2f3a;
+      --txt:#e9ecf1;
+      --muted:#9aa3b2;
+      --acc:#4aa3ff;
+      --good:#55ff9a;
+      --warn:#ffd36a;
+      --bad:#ff5a6a;
+      --radius:18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      background: radial-gradient(1200px 800px at 30% -10%, rgba(74,163,255,.20), transparent 60%),
+                  radial-gradient(900px 700px at 90% 10%, rgba(85,255,154,.12), transparent 55%),
+                  var(--bg);
+      color:var(--txt);
+    }
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      padding:18px 14px 28px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+    .brand{ display:flex; align-items:baseline; gap:10px; }
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.5px;
+      font-weight:700;
+    }
+    .brand .tag{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:12px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns:1fr; }
+    }
 
-<style>
-:root{
-  --bg:#0b0c10;
-  --panel:#12141b;
-  --panel2:#0f1117;
-  --line:#2a2f3a;
-  --txt:#e9ecf1;
-  --muted:#9aa3b2;
-  --acc:#4aa3ff;
-  --good:#55ff9a;
-  --warn:#ffd36a;
-  --bad:#ff5a6a;
-  --radius:18px;
-  --shadow:0 10px 30px rgba(0,0,0,.35);
-  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-}
+    /* DISPLAY */
+    .display{
+      padding:14px 14px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(0,0,0,.08));
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .displayRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .lcd{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .lcd .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      padding:7px 10px;
+      border-radius: 12px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .lcd .pill b{ color:var(--txt); font-weight:700; letter-spacing:.3px; }
+    .meter{
+      width:160px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .meter > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--acc), var(--good));
+      transition: width 80ms linear;
+    }
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
+    /* CONTROLS */
+    .controls{
+      padding:12px 14px 14px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 560px){
+      .controls{ grid-template-columns:1fr; }
+    }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-weight:650;
+      letter-spacing:.2px;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:hover{ background: rgba(255,255,255,.06); }
+    button:active{ transform: translateY(1px); }
+    button:disabled{ opacity:.45; cursor:not-allowed; }
+    .primary{
+      background: linear-gradient(180deg, rgba(74,163,255,.22), rgba(74,163,255,.08));
+      border-color: rgba(74,163,255,.35);
+    }
+    .danger{
+      background: linear-gradient(180deg, rgba(255,90,106,.22), rgba(255,90,106,.08));
+      border-color: rgba(255,90,106,.35);
+    }
+    .ghost{ background: rgba(0,0,0,.18); }
+    .tiny{
+      padding:8px 10px;
+      font-size:12px;
+      border-radius:12px;
+      font-weight:650;
+    }
+    .toggleOn{
+      border-color: rgba(85,255,154,.45) !important;
+      background: linear-gradient(180deg, rgba(85,255,154,.20), rgba(85,255,154,.07)) !important;
+    }
+    .toggleOff{ opacity:.85; }
 
-body{
-  margin:0;
-  font-family:var(--font);
-  background:
-    radial-gradient(1200px 800px at 30% -10%, rgba(74,163,255,.20), transparent 60%),
-    radial-gradient(900px 700px at 90% 10%, rgba(85,255,154,.12), transparent 55%),
-    var(--bg);
-  color:var(--txt);
-}
+    .sliders{ display:grid; gap:10px; }
+    .field{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding:10px 12px;
+      margin-top:10px;
+    }
+    .field label{
+      display:flex; align-items:center; justify-content:space-between;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+    }
+    input[type="range"]{ width:100%; }
+    .smallNote{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+      margin-top:10px;
+    }
+        /* TRACKS / SEQUENCER */
+    .seq{ padding:12px 14px 16px; }
+    .tracks{ display:grid; gap:10px; margin-bottom:12px; }
+    .track{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.16);
+      border-radius: 16px;
+      padding:10px 10px 12px;
+    }
+    .trackHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .trackName{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:.4px;
+      font-size:13px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: var(--acc);
+      box-shadow: 0 0 0 3px rgba(74,163,255,.10);
+    }
+    .dot.sn{ background: var(--warn); box-shadow: 0 0 0 3px rgba(255,211,106,.10); }
+    .dot.hh{ background: var(--good); box-shadow: 0 0 0 3px rgba(85,255,154,.10); }
+    .dot.bs{ background: var(--bad); box-shadow: 0 0 0 3px rgba(255,90,106,.10); }
 
-.wrap{
-  max-width:980px;
-  margin:0 auto;
-  padding:18px 14px 28px;
-}
+    .stepGrid{
+      display:grid;
+      grid-template-columns: repeat(16, 1fr);
+      gap:6px;
+    }
+    .step{
+      height:34px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .step.on{
+      background: rgba(74,163,255,.18);
+      border-color: rgba(74,163,255,.35);
+    }
+    .step.on.sn{ background: rgba(255,211,106,.20); border-color: rgba(255,211,106,.40); }
+    .step.on.hh{ background: rgba(85,255,154,.18); border-color: rgba(85,255,154,.38); }
+    .step.on.bs{ background: rgba(255,90,106,.18); border-color: rgba(255,90,106,.38); }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:12px;
-  flex-wrap:wrap;
-}
+    .step.playhead::after{
+      content:"";
+      position:absolute; inset:0;
+      background: rgba(255,255,255,.08);
+      mix-blend-mode: screen;
+      animation: flash 120ms ease-out;
+    }
+    @keyframes flash{ from{ opacity:1; } to{ opacity:0; } }
 
-.brand{
-  display:flex;
-  gap:10px;
-  align-items:baseline;
-}
-
-.brand h1{
-  margin:0;
-  font-size:18px;
-  font-weight:800;
-}
-
-.brand .tag{
-  font-size:12px;
-  color:var(--muted);
-  border:1px solid var(--line);
-  padding:4px 8px;
-  border-radius:999px;
-  background:rgba(255,255,255,.03);
-}
-
-.panel{
-  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:12px;
-}
-
-@media(max-width:860px){
-  .grid{ grid-template-columns:1fr; }
-}
-
-/* BUTTONS */
-button{
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.04);
-  color:var(--txt);
-  padding:10px 12px;
-  border-radius:14px;
-  font-weight:650;
-  transition:background .15s, transform .06s;
-  user-select:none;
-}
-
-button:hover{ background:rgba(255,255,255,.06); }
-button:active{ transform:translateY(1px); }
-button:disabled{ opacity:.45; cursor:not-allowed; }
-
-.primary{
-  background:linear-gradient(180deg, rgba(74,163,255,.22), rgba(74,163,255,.08));
-  border-color:rgba(74,163,255,.35);
-}
-
-.danger{
-  background:linear-gradient(180deg, rgba(255,90,106,.22), rgba(255,90,106,.08));
-  border-color:rgba(255,90,106,.35);
-}
-
-.ghost{ background:rgba(0,0,0,.18); }
-.tiny{ padding:8px 10px; font-size:12px; border-radius:12px; }
-
-.toggleOn{
-  border-color:rgba(85,255,154,.45)!important;
-  background:linear-gradient(180deg, rgba(85,255,154,.20), rgba(85,255,154,.07))!important;
-}
-
-.kbd{
-  font-family:ui-monospace, monospace;
-  font-size:12px;
-  padding:2px 8px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(0,0,0,.22);
-}
-
-.smallNote{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.35;
-}
-</style>
+    .side{ padding:14px; }
+    .box{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.16);
+      border-radius: 16px;
+      padding:12px;
+      margin-bottom:12px;
+    }
+    .box h3{
+      margin:0 0 10px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+    }
+    .row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .row .left{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color:var(--txt);
+      font-weight:650;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: rgba(255,255,255,.85);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size:12px;
+    }
+    .footer{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+      opacity:.9;
+    }
+    a{ color: var(--acc); text-decoration:none; }
+  </style>
 </head>
 <body>
   <div class="wrap">
-
-    <!-- TOP BAR -->
     <div class="topbar">
       <div class="brand">
         <h1>Pocket Groove</h1>
-        <span class="tag">16-step • WebAudio • Sampler + WAV</span>
+        <span class="tag">16-step • WebAudio • Sampler + WAV export</span>
       </div>
-
       <div class="btnRow">
         <button id="btnStartAudio" class="primary" type="button">START AUDIO</button>
         <button id="btnPlay" class="primary toggleOff" type="button">PLAY</button>
@@ -157,13 +322,9 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
       </div>
     </div>
 
-    <!-- MAIN GRID -->
     <div class="grid">
-
-      <!-- LEFT PANEL : SEQUENCER -->
+      <!-- LEFT: Sequencer -->
       <div class="panel">
-
-        <!-- DISPLAY -->
         <div class="display">
           <div class="displayRow">
             <div class="lcd">
@@ -172,17 +333,13 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
               <div class="pill">PATTERN <b id="lcdPat">A</b></div>
               <div class="pill">STEP <b id="lcdStep">1</b></div>
             </div>
-
-            <div class="meter" title="Output level">
+            <div class="meter" title="output level">
               <i id="meterFill"></i>
             </div>
           </div>
         </div>
 
-        <!-- CONTROLS -->
         <div class="controls">
-
-          <!-- BPM -->
           <div class="field" style="margin-top:0;">
             <label>
               <span>Tempo</span>
@@ -191,9 +348,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
             <input id="bpm" type="range" min="60" max="160" value="120" />
           </div>
 
-          <!-- SWING + TOOLS -->
           <div class="sliders">
-
             <div class="field" style="margin-top:0;">
               <label>
                 <span>Swing</span>
@@ -208,22 +363,17 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
               <button id="btnRandom" class="tiny" type="button">RANDOM</button>
               <button id="btnClear" class="tiny danger" type="button">CLEAR</button>
             </div>
-
           </div>
         </div>
 
-        <!-- SEQUENCER GRID -->
         <div class="seq">
           <div class="tracks" id="tracks"></div>
-
           <div class="smallNote">
-            Suggerimento: premi <b>START AUDIO</b>, poi <b>PLAY</b>.  
-            Tocca gli step per programmare il groove.
+            Suggerimento: attiva <b>START AUDIO</b>, poi PLAY. Tocca gli step per programmare.
           </div>
         </div>
-
       </div>
-            <!-- RIGHT PANEL -->
+            <!-- RIGHT -->
       <div class="panel">
         <div class="side">
 
@@ -238,7 +388,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
               </div>
               <div class="left">
                 <span class="kbd">Space</span>
-                <span class="smallNote">Play / Pause</span>
+                <span style="color:var(--muted); font-size:12px;">Play/Pause</span>
               </div>
             </div>
             <div class="smallNote" id="presetStatus">Nessun preset salvato.</div>
@@ -257,13 +407,11 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
                 <span class="kbd" id="recTimer">00:00</span>
               </div>
             </div>
-            <div class="smallNote" id="recStatus">
-              Pronto. Premi REC per registrare l'output (post-FX).
-            </div>
+            <div class="smallNote" id="recStatus">Pronto. Premi REC per registrare l'output.</div>
             <a id="wavDownload" style="display:none;"></a>
           </div>
 
-          <!-- FX XY -->
+          <!-- FX -->
           <div class="box">
             <h3>FX</h3>
             <div class="row">
@@ -273,35 +421,24 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
               </div>
               <div class="left">
                 <span class="kbd">Drag</span>
-                <span class="smallNote">XY</span>
+                <span style="color:var(--muted); font-size:12px;">XY</span>
               </div>
             </div>
 
             <div id="fxPad"
-              style="margin-top:10px; height:190px;
-                     border-radius:16px;
-                     border:1px solid rgba(255,255,255,.10);
-                     background:rgba(0,0,0,.25);
-                     position:relative;
-                     overflow:hidden;
-                     touch-action:none;">
-
+                 style="margin-top:10px; height:190px; border-radius:16px;
+                        border:1px solid rgba(255,255,255,.10);
+                        background: rgba(0,0,0,.25);
+                        position:relative; overflow:hidden; touch-action:none;">
               <div id="fxDot"
-                style="width:16px;height:16px;
-                       border-radius:50%;
-                       background:rgba(74,163,255,.95);
-                       position:absolute;
-                       left:50%;top:50%;
-                       transform:translate(-50%,-50%);
-                       box-shadow:0 0 0 6px rgba(74,163,255,.15);">
-              </div>
+                   style="width:16px;height:16px;border-radius:50%;
+                          background:rgba(74,163,255,.95);
+                          position:absolute;left:50%;top:50%;
+                          transform:translate(-50%,-50%);
+                          box-shadow:0 0 0 6px rgba(74,163,255,.15);"></div>
 
-              <div style="position:absolute;left:10px;top:10px;font-size:12px;color:var(--muted);">
-                X: Filter
-              </div>
-              <div style="position:absolute;right:10px;bottom:10px;font-size:12px;color:var(--muted);text-align:right;">
-                Y: Stutter
-              </div>
+              <div style="position:absolute; left:10px; top:10px; color:var(--muted); font-size:12px;">X: Filter</div>
+              <div style="position:absolute; right:10px; bottom:10px; color:var(--muted); font-size:12px; text-align:right;">Y: Stutter</div>
             </div>
 
             <div class="smallNote" id="fxReadout">Filter: 50% • Stutter: Off</div>
@@ -310,9 +447,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
           <!-- BASS -->
           <div class="box">
             <h3>Bass</h3>
-            <label for="bassNote" class="smallNote" style="display:block;margin-bottom:8px;">
-              Nota
-            </label>
+            <label for="bassNote" style="display:block; color:var(--muted); font-size:12px; margin-bottom:8px;">Nota</label>
             <select id="bassNote">
               <option value="55">A1 (55Hz)</option>
               <option value="61.735">B1 (61.7Hz)</option>
@@ -323,11 +458,10 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
               <option value="110">A2 (110Hz)</option>
             </select>
             <div class="smallNote">
-              Bass mono “una nota”: cambia la nota e crea pattern ipnotici.
+              Bass mono "una nota" pensata per minimal: cambia la nota e crea pattern ipnotici.
             </div>
           </div>
-
-          <!-- SAMPLER MIC -->
+                    <!-- SAMPLER MIC -->
           <div class="box">
             <h3>Sampler (Mic)</h3>
 
@@ -348,7 +482,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
                 <button id="btnClearSample" class="tiny ghost" type="button" disabled>CLEAR</button>
               </div>
               <div class="left">
-                <label class="smallNote" style="display:flex;gap:6px;align-items:center;">
+                <label style="display:flex; gap:8px; align-items:center; color:var(--muted); font-size:12px;">
                   <input id="chkMonitor" type="checkbox" />
                   Monitor
                 </label>
@@ -356,67 +490,50 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
             </div>
 
             <div class="field">
-              <label>
-                <span>Start Trim</span>
-                <span><span class="kbd" id="trimVal">0%</span></span>
-              </label>
+              <label><span>Start Trim</span><span><span class="kbd" id="trimVal">0%</span></span></label>
               <input id="trimStart" type="range" min="0" max="80" value="0" />
             </div>
 
             <div class="field">
-              <label>
-                <span>Pitch</span>
-                <span><span class="kbd" id="pitchVal">0 st</span></span>
-              </label>
+              <label><span>Pitch</span><span><span class="kbd" id="pitchVal">0 st</span></span></label>
               <input id="pitchSemi" type="range" min="-12" max="12" value="0" />
             </div>
 
             <div class="field">
-              <label>
-                <span>Filter</span>
-                <span><span class="kbd" id="filtVal">100%</span></span>
-              </label>
+              <label><span>Filter</span><span><span class="kbd" id="filtVal">100%</span></span></label>
               <input id="sampleFilter" type="range" min="0" max="100" value="100" />
             </div>
 
             <div class="field">
-              <label>
-                <span>Decay</span>
-                <span><span class="kbd" id="decayVal">120 ms</span></span>
-              </label>
+              <label><span>Decay</span><span><span class="kbd" id="decayVal">120 ms</span></span></label>
               <input id="sampleDecay" type="range" min="40" max="600" value="120" />
             </div>
 
-            <div class="smallNote" id="micStatus">
-              Premi ARM MIC, registra, poi USE AS SAMPLE.
-            </div>
+            <div class="smallNote" id="micStatus">Premi ARM MIC (permesso microfono), registra, poi USE AS SAMPLE.</div>
           </div>
 
           <!-- ABOUT -->
           <div class="box">
             <h3>About</h3>
             <div class="smallNote">
-              Pocket Groove • WebAudio groovebox.<br/>
-              FX XY, Sampler Mic, Groove presets, Export WAV.
+              Prototype by PezzaliAPP • WebAudio • GitHub Pages ready.<br/>
+              Funzioni: FX XY, Sampler Mic, Export WAV, Groove presets.
             </div>
           </div>
 
-          <div class="footer smallNote">
+          <div class="footer">
             Repo: <b>pocket-groove</b>
           </div>
 
         </div>
       </div>
-
-    </div> <!-- end grid -->
-  </div> <!-- end wrap -->
-  <script>
+    </div>
+  </div>
+    <script>
 (() => {
   "use strict";
 
-  // ============
-  // STATE / DATA
-  // ============
+  // ---------- State ----------
   const TRACKS = [
     { id:"kick",   name:"KICK",   cls:""   },
     { id:"snare",  name:"SNARE",  cls:"sn" },
@@ -425,18 +542,29 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     { id:"sample", name:"SAMPLE", cls:""   },
   ];
 
-  // pattern A/B
   let pattern = {
-    A: { kick:new Array(16).fill(false), snare:new Array(16).fill(false), hat:new Array(16).fill(false), bass:new Array(16).fill(false), sample:new Array(16).fill(false) },
-    B: { kick:new Array(16).fill(false), snare:new Array(16).fill(false), hat:new Array(16).fill(false), bass:new Array(16).fill(false), sample:new Array(16).fill(false) },
+    A: {
+      kick:   new Array(16).fill(false),
+      snare:  new Array(16).fill(false),
+      hat:    new Array(16).fill(false),
+      bass:   new Array(16).fill(false),
+      sample: new Array(16).fill(false),
+    },
+    B: {
+      kick:   new Array(16).fill(false),
+      snare:  new Array(16).fill(false),
+      hat:    new Array(16).fill(false),
+      bass:   new Array(16).fill(false),
+      sample: new Array(16).fill(false),
+    }
   };
 
   // starter groove (sample vuoto)
-  pattern.A.kick   = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0].map(Boolean);
-  pattern.A.snare  = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0].map(Boolean);
-  pattern.A.hat    = [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1].map(Boolean);
-  pattern.A.bass   = [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0].map(Boolean);
-  pattern.A.sample = new Array(16).fill(false);
+  pattern.A.kick  = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0].map(Boolean);
+  pattern.A.snare = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0].map(Boolean);
+  pattern.A.hat   = [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1].map(Boolean);
+  pattern.A.bass  = [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0].map(Boolean);
+  pattern.A.sample= new Array(16).fill(false);
 
   let currentPat = "A";
   let stepIndex = 0;
@@ -452,9 +580,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   const scheduleAheadSec = 0.12;
   let timerId = null;
 
-  // ============
-  // AUDIO STATE
-  // ============
+  // audio
   let audioCtx = null;
   let master = null;
   let analyser = null;
@@ -463,18 +589,8 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   // bass note
   let bassHz = 82.407;
 
-  // FX state
-  let holdFx = false;
-  let fxX = 0.5; // 0..1 (filter)
-  let fxY = 0.0; // 0..1 (stutter)
-  let stutterTimer = null;
-  let stutterCurrentHz = 0;
-
-  // =================
-  // UI REFERENCES
-  // =================
+  // ---------- UI refs ----------
   const elTracks = document.getElementById("tracks");
-
   const btnStartAudio = document.getElementById("btnStartAudio");
   const btnPlay = document.getElementById("btnPlay");
   const btnStop = document.getElementById("btnStop");
@@ -503,7 +619,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   const bassNoteSel = document.getElementById("bassNote");
 
-  // WAV REC refs
+  // Record WAV refs
   const btnRec = document.getElementById("btnRec");
   const btnRecStop = document.getElementById("btnRecStop");
   const btnRecSave = document.getElementById("btnRecSave");
@@ -511,52 +627,45 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   const recTimer = document.getElementById("recTimer");
   const wavDownload = document.getElementById("wavDownload");
 
-  // FX refs
-  const btnHoldFx = document.getElementById("btnHoldFx");
-  const btnFxReset = document.getElementById("btnFxReset");
-  const fxPad = document.getElementById("fxPad");
-  const fxDot = document.getElementById("fxDot");
-  const fxReadout = document.getElementById("fxReadout");
-
-  // =================
-  // UTILS
-  // =================
-  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
-
-  function mmss(sec){
-    sec = Math.max(0, Math.floor(sec));
-    const m = String(Math.floor(sec/60)).padStart(2,"0");
-    const s = String(sec%60).padStart(2,"0");
-    return `${m}:${s}`;
-  }
-
   // ---------- Bass selector ----------
   if (bassNoteSel) {
     bassNoteSel.addEventListener("change", () => {
       bassHz = Number(bassNoteSel.value) || bassHz;
     });
   }
-    // ==========================
-  // FX XY PAD
-  // ==========================
+
+  // ---------- FX refs ----------
+  const btnHoldFx = document.getElementById("btnHoldFx");
+  const btnFxReset = document.getElementById("btnFxReset");
+  const fxPad = document.getElementById("fxPad");
+  const fxDot = document.getElementById("fxDot");
+  const fxReadout = document.getElementById("fxReadout");
+
+  let holdFx = false;
+  let fxX = 0.5; // 0..1 (filter)
+  let fxY = 0.0; // 0..1 (stutter)
+  let stutterTimer = null;
+  let stutterCurrentHz = 0;
+
   function setFxDot(){
-    if(!fxPad || !fxDot) return;
+    if (!fxPad || !fxDot) return;
     fxDot.style.left = (fxX * 100) + "%";
     fxDot.style.top  = ((1 - fxY) * 100) + "%";
   }
 
   function fxFilterFreqFromX(x){
     const min = 200, max = 18000;
-    const k = Math.pow(clamp01(x), 2.2);
+    const t = Math.max(0, Math.min(1, x));
+    const k = Math.pow(t, 2.2);
     return min + (max - min) * k;
   }
 
   function stopStutter(){
     const fx = window.__PG_FX__;
-    if(fx && audioCtx){
+    if (fx && audioCtx) {
       fx.stutterGain.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.01);
     }
-    if(stutterTimer){
+    if (stutterTimer) {
       clearInterval(stutterTimer);
       stutterTimer = null;
     }
@@ -565,10 +674,10 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   function startStutter(rateHz){
     const fx = window.__PG_FX__;
-    if(!fx || !audioCtx) return;
+    if (!fx || !audioCtx) return;
 
     const hz = Math.max(2, Math.min(30, rateHz));
-    if(stutterTimer && Math.abs(hz - stutterCurrentHz) < 0.5) return;
+    if (stutterTimer && Math.abs(hz - stutterCurrentHz) < 0.5) return;
 
     stopStutter();
     stutterCurrentHz = hz;
@@ -582,35 +691,32 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   function updateFx(){
     const fx = window.__PG_FX__;
-    if(!fx || !started || !audioCtx) return;
+    if (!fx || !started || !audioCtx) return;
 
-    fx.filter.frequency.setTargetAtTime(
-      fxFilterFreqFromX(fxX),
-      audioCtx.currentTime,
-      0.01
-    );
+    const freq = fxFilterFreqFromX(fxX);
+    fx.filter.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.01);
 
-    if(fxY < 0.05){
+    if (fxY < 0.05) {
       stopStutter();
-      fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`;
-    }else{
-      const hz = 2 + fxY * 18;
-      startStutter(hz);
-      fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: ${Math.round(hz)} Hz`;
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`);
+    } else {
+      const rateHz = 2 + fxY * 18;
+      startStutter(rateHz);
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: ${Math.round(rateHz)} Hz`);
     }
-
     setFxDot();
   }
 
-  function setFxFromPointer(x, y){
+  function setFxFromPointer(clientX, clientY){
+    if (!fxPad) return;
     const r = fxPad.getBoundingClientRect();
-    fxX = clamp01((x - r.left) / r.width);
-    fxY = clamp01(1 - (y - r.top) / r.height);
+    fxX = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    fxY = Math.max(0, Math.min(1, 1 - (clientY - r.top) / r.height));
   }
 
-  if(fxPad){
-    fxPad.addEventListener("pointerdown", e => {
-      if(!started) return;
+  if (fxPad && btnHoldFx && btnFxReset) {
+    fxPad.addEventListener("pointerdown", (e) => {
+      if (!started) { presetStatus.textContent = "Tocca START AUDIO prima."; return; }
       fxPad.setPointerCapture(e.pointerId);
       holdFx = true;
       btnHoldFx.classList.add("toggleOn");
@@ -618,8 +724,8 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
       updateFx();
     });
 
-    fxPad.addEventListener("pointermove", e => {
-      if(!holdFx) return;
+    fxPad.addEventListener("pointermove", (e) => {
+      if (!holdFx) return;
       setFxFromPointer(e.clientX, e.clientY);
       updateFx();
     });
@@ -628,34 +734,32 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
       holdFx = false;
       btnHoldFx.classList.remove("toggleOn");
       stopStutter();
-      updateFx();
+      fxReadout && (fxReadout.textContent = `Filter: ${Math.round(fxX*100)}% • Stutter: Off`);
+      setFxDot();
     });
+
+    btnHoldFx.addEventListener("click", () => {
+      if (!started) { presetStatus.textContent = "Tocca START AUDIO prima."; return; }
+      holdFx = !holdFx;
+      btnHoldFx.classList.toggle("toggleOn", holdFx);
+      if (holdFx) updateFx();
+      else stopStutter();
+    });
+
+    btnFxReset.addEventListener("click", () => {
+      fxX = 0.5; fxY = 0.0;
+      stopStutter();
+      updateFx();
+      fxReadout && (fxReadout.textContent = "Filter: 50% • Stutter: Off");
+    });
+
+    setFxDot();
   }
 
-  btnHoldFx?.addEventListener("click", () => {
-    if(!started) return;
-    holdFx = !holdFx;
-    btnHoldFx.classList.toggle("toggleOn", holdFx);
-    if(!holdFx) stopStutter();
-  });
-
-  btnFxReset?.addEventListener("click", () => {
-    fxX = 0.5;
-    fxY = 0.0;
-    stopStutter();
-    updateFx();
-    fxReadout.textContent = "Filter: 50% • Stutter: Off";
-  });
-
-  // ==========================
-  // AUDIO ENGINE + FX CHAIN
-  // ==========================
+  // ---------- Audio init + FX chain ----------
   function ensureAudio(){
     if(audioCtx) return;
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-      latencyHint: "interactive"
-    });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:"interactive" });
 
     master = audioCtx.createGain();
     master.gain.value = 0.9;
@@ -677,9 +781,10 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     analyser.connect(audioCtx.destination);
 
     window.__PG_FX__ = { filter, stutterGain };
-    window.__PG_REC_SRC__ = stutterGain;
+    window.__PG_REC_SRC__ = stutterGain; // recorder tap (post-FX)
 
-    setFxDot();
+    // update UI
+    setTimeout(() => updateFx(), 0);
   }
 
   async function startAudio(){
@@ -691,10 +796,12 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     btnStartAudio.textContent = "AUDIO OK";
     btnStartAudio.classList.add("toggleOn");
     btnStartAudio.disabled = true;
+
+    // sync FX to audio when ready
     updateFx();
   }
     // =========================
-  // RECORD WAV (output post-FX)
+  // Record WAV (output post-FX)
   // =========================
   let recNode = null;
   let recZero = null;
@@ -735,17 +842,16 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     recChunksR = [];
     recLength = 0;
 
-    // Nota: ScriptProcessor è deprecato ma ancora supportato (perfetto per prototipi / GitHub Pages)
     const bufferSize = 4096;
     recNode = audioCtx.createScriptProcessor(bufferSize, 2, 2);
-
-    // nodo “zero” per tenerlo vivo senza sommare audio
     recZero = audioCtx.createGain();
     recZero.gain.value = 0.0;
+
+    // keep alive
     recNode.connect(recZero);
     recZero.connect(audioCtx.destination);
 
-    // tap post-FX (stutterGain)
+    // tap post-FX
     src.connect(recNode);
 
     recNode.onaudioprocess = (e) => {
@@ -759,7 +865,6 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
       recChunksR.push(new Float32Array(inR));
       recLength += inL.length;
     };
-
     return true;
   }
 
@@ -785,9 +890,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   }
 
   function writeString(view, offset, str){
-    for(let i=0;i<str.length;i++){
-      view.setUint8(offset + i, str.charCodeAt(i));
-    }
+    for(let i=0;i<str.length;i++) view.setUint8(offset + i, str.charCodeAt(i));
   }
 
   function floatTo16BitPCM(view, offset, input){
@@ -813,12 +916,12 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     writeString(view, 8, "WAVE");
     writeString(view, 12, "fmt ");
     view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM
+    view.setUint16(20, 1, true);
     view.setUint16(22, numChannels, true);
     view.setUint32(24, sampleRate, true);
     view.setUint32(28, byteRate, true);
     view.setUint16(32, blockAlign, true);
-    view.setUint16(34, 16, true); // 16-bit
+    view.setUint16(34, 16, true);
     writeString(view, 36, "data");
     view.setUint32(40, dataSize, true);
 
@@ -847,13 +950,9 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     if(!recRunning) return;
     recRunning = false;
 
-    if(recTimerId){
-      clearInterval(recTimerId);
-      recTimerId = null;
-    }
+    if(recTimerId){ clearInterval(recTimerId); recTimerId = null; }
     updateRecTimer();
 
-    // stacca tap
     try{
       const src = window.__PG_REC_SRC__;
       if(src && recNode) src.disconnect(recNode);
@@ -876,16 +975,13 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
     const left = mergeFloat32(recChunksL, recLength);
     const right = mergeFloat32(recChunksR, recLength);
-
     const interleaved = interleaveStereo(left, right);
-    const wavBlob = encodeWAV(interleaved, recSampleRate);
+    const wav = encodeWAV(interleaved, recSampleRate);
 
-    const url = URL.createObjectURL(wavBlob);
+    const url = URL.createObjectURL(wav);
     const ts = new Date();
     const pad = (n)=>String(n).padStart(2,"0");
-    const name =
-      `pocket-groove_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_` +
-      `${pad(ts.getHours())}${pad(ts.getMinutes())}${pad(ts.getSeconds())}.wav`;
+    const name = `pocket-groove_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}${pad(ts.getSeconds())}.wav`;
 
     if(wavDownload){
       wavDownload.href = url;
@@ -896,10 +992,11 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     recStatus && (recStatus.textContent = "WAV pronto. Premi Download WAV.");
   }
 
-  btnRec?.addEventListener("click", recStart);
-  btnRecStop?.addEventListener("click", recStop);
-  btnRecSave?.addEventListener("click", recSave);
-    // =====================
+  btnRec && btnRec.addEventListener("click", recStart);
+  btnRecStop && btnRecStop.addEventListener("click", recStop);
+  btnRecSave && btnRecSave.addEventListener("click", recSave);
+
+  // =====================
   // Sampler (Mic) - 1 slot
   // =====================
   const btnMicArm   = document.getElementById("btnMicArm");
@@ -983,17 +1080,9 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     sampleDecayMs = Number(sampleDecayEl.value) || 120;
     updateSamplerLabels();
   });
-
   updateSamplerLabels();
 
-  // --------------------------
-  // Mic Worklet (load once)
-  // --------------------------
-  let micWorkletLoaded = false;
-
   async function ensureMicWorklet(){
-    if(micWorkletLoaded) return;
-
     ensureAudio();
     if(!audioCtx) return;
 
@@ -1002,7 +1091,6 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
         process(inputs) {
           const input = inputs[0];
           if (input && input[0]) {
-            // invio mono (canale 0)
             this.port.postMessage(input[0]);
           }
           return true;
@@ -1010,23 +1098,17 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
       }
       registerProcessor('mic-tap', MicTapProcessor);
     `;
-
     const blob = new Blob([code], { type:"application/javascript" });
     const url = URL.createObjectURL(blob);
     await audioCtx.audioWorklet.addModule(url);
     URL.revokeObjectURL(url);
-
-    micWorkletLoaded = true;
   }
 
-  // --------------------------
-  // Arm mic + monitor
-  // --------------------------
   let monitorListenerBound = false;
 
   async function armMic(){
     try{
-      await startAudio(); // gesto utente (Safari iOS)
+      await startAudio(); // must be user gesture
 
       if(!navigator.mediaDevices?.getUserMedia){
         micStatus && (micStatus.textContent = "getUserMedia non disponibile su questo browser.");
@@ -1045,33 +1127,25 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
       await ensureMicWorklet();
 
-      // crea catena mic -> worklet (tap) + opzionale monitor
       micSrc = audioCtx.createMediaStreamSource(micStream);
-      micWorklet = new AudioWorkletNode(audioCtx, "mic-tap", {
-        numberOfInputs: 1,
-        numberOfOutputs: 0
-      });
+      micWorklet = new AudioWorkletNode(audioCtx, "mic-tap", { numberOfInputs:1, numberOfOutputs:0 });
 
       micMonitorGain = audioCtx.createGain();
-      micMonitorGain.gain.value = chkMonitor?.checked ? 0.8 : 0.0;
+      micMonitorGain.gain.value = 0.0;
 
-      // ricezione chunk dal worklet
       micWorklet.port.onmessage = (e) => {
         if(!micRecording) return;
         const chunk = e.data; // Float32Array
-        if(!chunk || !chunk.length) return;
         micRecChunks.push(new Float32Array(chunk));
         micRecLen += chunk.length;
       };
 
-      // connessioni
       micSrc.connect(micWorklet);
 
-      // monitor nel master (quindi passa anche negli FX / REC)
+      // optional monitor into master (post-synth, pre-FX)
       micSrc.connect(micMonitorGain);
       micMonitorGain.connect(master);
 
-      // bind una sola volta
       if(chkMonitor && !monitorListenerBound){
         chkMonitor.addEventListener("change", () => {
           if(!micMonitorGain) return;
@@ -1092,21 +1166,15 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     }
   }
 
-  // --------------------------
-  // Mic record
-  // --------------------------
   function micRecStart(){
     if(!micArmed || micRecording) return;
-
     micRecChunks = [];
     micRecLen = 0;
-
     micRecording = true;
     micStartTs = performance.now();
-
     micTimer && (micTimer.textContent = "00:00");
     micTimerId = setInterval(() => {
-      micTimer && (micTimer.textContent = mmss((performance.now() - micStartTs)/1000));
+      micTimer && (micTimer.textContent = mmss((performance.now()-micStartTs)/1000));
     }, 200);
 
     micStatus && (micStatus.textContent = "REC… fai un suono/voce, poi STOP.");
@@ -1115,63 +1183,31 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   function micRecStop(){
     if(!micRecording) return;
-
     micRecording = false;
-    if(micTimerId){
-      clearInterval(micTimerId);
-      micTimerId = null;
-    }
-
+    if(micTimerId){ clearInterval(micTimerId); micTimerId = null; }
     micStatus && (micStatus.textContent = micRecLen ? "STOP. Premi USE AS SAMPLE." : "STOP. Nessun audio registrato.");
     setSamplerUIState();
   }
 
-  // --------------------------
-  // Buffer utils + Normalize
-  // --------------------------
   function mergeMono(chunks, total){
     const out = new Float32Array(total);
     let off = 0;
-    for(const c of chunks){
-      out.set(c, off);
-      off += c.length;
-    }
+    for(const c of chunks){ out.set(c, off); off += c.length; }
     return out;
   }
 
-  function normalizeInPlace(buf){
-    let peak = 0;
-    for(let i=0;i<buf.length;i++){
-      const a = Math.abs(buf[i]);
-      if(a > peak) peak = a;
-    }
-    const gain = peak > 0 ? (0.95 / peak) : 1;
-    for(let i=0;i<buf.length;i++){
-      buf[i] *= gain;
-    }
-    return { peak, gain };
-  }
-
-  // --------------------------
-  // Use as sample (FIXED)
-  // --------------------------
   function useAsSample(){
     if(micRecLen === 0) return;
     ensureAudio();
-    if(!audioCtx) return;
 
     const mono = mergeMono(micRecChunks, micRecLen);
-
-    // NORMALIZE (essenziale per voce/registrazioni deboli)
-    normalizeInPlace(mono);
-
     const buf = audioCtx.createBuffer(1, mono.length, micRecSampleRate);
     buf.copyToChannel(mono, 0, 0);
 
     sampleBuf = buf;
     sampleReady = true;
 
-    micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva gli step SAMPLE.");
+    micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva step sulla traccia SAMPLE.");
     setSamplerUIState();
   }
 
@@ -1182,26 +1218,21 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     setSamplerUIState();
   }
 
-  // --------------------------
-  // Trigger sample
-  // --------------------------
   function triggerSample(when){
     if(!sampleReady || !sampleBuf || !audioCtx) return;
 
     const src = audioCtx.createBufferSource();
     src.buffer = sampleBuf;
 
-    // pitch (semitoni)
+    // pitch in semitones
     const rate = Math.pow(2, pitchSemi / 12);
     src.playbackRate.setValueAtTime(rate, when);
 
-    // gain envelope
     const g = audioCtx.createGain();
     g.gain.setValueAtTime(0.0001, when);
     g.gain.exponentialRampToValueAtTime(0.95, when + 0.003);
     g.gain.exponentialRampToValueAtTime(0.0001, when + (sampleDecayMs/1000));
 
-    // filter
     const f = audioCtx.createBiquadFilter();
     f.type = "lowpass";
     const minF = 300, maxF = 18000;
@@ -1213,7 +1244,6 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     f.connect(g);
     g.connect(master);
 
-    // trim start + max duration
     const startOffset = sampleBuf.duration * trimStartPct;
     const maxDur = Math.min(2.0, Math.max(0.05, sampleBuf.duration - startOffset));
 
@@ -1221,9 +1251,6 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     src.stop(when + maxDur + 0.05);
   }
 
-  // --------------------------
-  // Buttons
-  // --------------------------
   btnMicArm?.addEventListener("click", armMic);
   btnMicRec?.addEventListener("click", micRecStart);
   btnMicStop?.addEventListener("click", micRecStop);
@@ -1231,10 +1258,97 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   btnClearSample?.addEventListener("click", clearSample);
 
   setSamplerUIState();
-    // ==========================
-  // SOUND GENERATORS
-  // ==========================
+    // ---------- Build UI ----------
+  function buildTracksUI(){
+    elTracks.innerHTML = "";
+    TRACKS.forEach(t => {
+      const wrap = document.createElement("div");
+      wrap.className = "track";
 
+      const header = document.createElement("div");
+      header.className = "trackHeader";
+
+      const name = document.createElement("div");
+      name.className = "trackName";
+      const dot = document.createElement("span");
+      dot.className = "dot " + t.cls;
+      const label = document.createElement("span");
+      label.textContent = t.name;
+      name.appendChild(dot);
+      name.appendChild(label);
+
+      const mini = document.createElement("div");
+      mini.className = "btnRow";
+      const btn = document.createElement("button");
+      btn.className = "tiny";
+      btn.type = "button";
+      btn.textContent = "TRIG";
+      btn.title = "Trigger suono";
+      btn.addEventListener("click", () => {
+        ensureAudio();
+        const when = audioCtx.currentTime + 0.005;
+        triggerTrack(t.id, when);
+      });
+      mini.appendChild(btn);
+
+      header.appendChild(name);
+      header.appendChild(mini);
+
+      const grid = document.createElement("div");
+      grid.className = "stepGrid";
+      grid.dataset.track = t.id;
+
+      for(let i=0;i<16;i++){
+        const s = document.createElement("div");
+        s.className = "step";
+        s.dataset.step = String(i);
+        s.addEventListener("pointerdown", (ev) => {
+          ev.preventDefault();
+          toggleStep(t.id, i);
+        });
+        grid.appendChild(s);
+      }
+
+      wrap.appendChild(header);
+      wrap.appendChild(grid);
+      elTracks.appendChild(wrap);
+    });
+
+    renderSteps();
+  }
+
+  function renderSteps(){
+    const pat = pattern[currentPat];
+    document.querySelectorAll(".stepGrid").forEach(grid => {
+      const track = grid.dataset.track;
+      const arr = pat[track];
+      [...grid.children].forEach((cell, i) => {
+        const t = TRACKS.find(x => x.id === track);
+        cell.className = "step" + (arr[i] ? " on " + (t?.cls || "") : "");
+      });
+    });
+  }
+
+  function flashPlayhead(step){
+    lcdStep.textContent = String(step + 1);
+    document.querySelectorAll(".stepGrid").forEach(grid => {
+      const cell = grid.children[step];
+      cell.classList.add("playhead");
+      setTimeout(() => cell.classList.remove("playhead"), 140);
+    });
+  }
+
+  function toggleStep(track, idx){
+    const pat = pattern[currentPat];
+    pat[track][idx] = !pat[track][idx];
+    renderSteps();
+
+    if(started && pat[track][idx]){
+      triggerTrack(track, audioCtx.currentTime + 0.005);
+    }
+  }
+
+  // ---------- Sound generators ----------
   function triggerKick(when){
     const o = audioCtx.createOscillator();
     const g = audioCtx.createGain();
@@ -1271,24 +1385,17 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     const o = audioCtx.createOscillator();
     o.type = "triangle";
     o.frequency.setValueAtTime(220, when);
-
     const og = audioCtx.createGain();
     og.gain.setValueAtTime(0.0001, when);
     og.gain.exponentialRampToValueAtTime(0.35, when + 0.004);
     og.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
 
-    n.connect(hp);
-    hp.connect(g);
-
-    o.connect(og);
-    og.connect(g);
-
+    n.connect(hp); hp.connect(g);
+    o.connect(og); og.connect(g);
     g.connect(master);
 
-    n.start(when);
-    n.stop(when + 0.16);
-    o.start(when);
-    o.stop(when + 0.12);
+    n.start(when); n.stop(when + 0.16);
+    o.start(when); o.stop(when + 0.12);
   }
 
   function triggerHat(when){
@@ -1306,9 +1413,7 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     g.gain.exponentialRampToValueAtTime(0.35, when + 0.002);
     g.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
 
-    n.connect(bp);
-    bp.connect(g);
-    g.connect(master);
+    n.connect(bp); bp.connect(g); g.connect(master);
 
     n.start(when);
     n.stop(when + 0.06);
@@ -1330,76 +1435,43 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     g.gain.exponentialRampToValueAtTime(0.55, when + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, when + 0.16);
 
-    o.connect(f);
-    f.connect(g);
-    g.connect(master);
+    o.connect(f); f.connect(g); g.connect(master);
 
     o.start(when);
     o.stop(when + 0.18);
   }
 
-  // ==========================
-  // NOISE BUFFER (cached)
-  // ==========================
   let _noiseBuffer = null;
-
   function makeNoiseBuffer(){
     if(_noiseBuffer) return _noiseBuffer;
-
     const length = audioCtx.sampleRate * 0.5;
     const buffer = audioCtx.createBuffer(1, length, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
-
-    for(let i = 0; i < length; i++){
-      data[i] = Math.random() * 2 - 1;
-    }
-
+    for(let i=0;i<length;i++) data[i] = (Math.random() * 2 - 1);
     _noiseBuffer = buffer;
     return buffer;
   }
 
-  // ==========================
-  // TRACK DISPATCHER
-  // ==========================
   function triggerTrack(trackId, when){
-    if(!audioCtx) return;
-
     switch(trackId){
-      case "kick":
-        triggerKick(when);
-        break;
-
-      case "snare":
-        triggerSnare(when);
-        break;
-
-      case "hat":
-        triggerHat(when);
-        break;
-
-      case "bass":
-        triggerBass(when);
-        break;
-
-      case "sample":
-        triggerSample(when);
-        break;
+      case "kick":   triggerKick(when); break;
+      case "snare":  triggerSnare(when); break;
+      case "hat":    triggerHat(when); break;
+      case "bass":   triggerBass(when); break;
+      case "sample": triggerSample(when); break;
     }
   }
-    // ==========================
-  // SEQUENCER TIMING
-  // ==========================
-  function secondsPerStep(){
-    return 60 / bpm / 4; // 16th
-  }
 
-  function swingOffset(step){
-    return (step % 2 === 1) ? secondsPerStep() * swing : 0;
+  // ---------- Sequencer timing ----------
+  function secondsPerStep(){ return 60.0 / bpm / 4.0; } // 16th
+
+  function swingOffsetForStep(step){
+    if(step % 2 === 1) return secondsPerStep() * swing;
+    return 0;
   }
 
   function scheduleStep(step, time){
     const pat = pattern[currentPat];
-
     if(pat.kick[step])   triggerKick(time);
     if(pat.snare[step])  triggerSnare(time);
     if(pat.hat[step])    triggerHat(time);
@@ -1412,9 +1484,8 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   function scheduler(){
     if(!isPlaying) return;
-
     while(nextStepTime < audioCtx.currentTime + scheduleAheadSec){
-      const offset = swingOffset(stepIndex);
+      const offset = swingOffsetForStep(stepIndex);
       scheduleStep(stepIndex, nextStepTime + offset);
       stepIndex = (stepIndex + 1) % 16;
       nextStepTime += secondsPerStep();
@@ -1423,11 +1494,13 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
 
   function startSequencer(){
     ensureAudio();
-    if(!started || isPlaying) return;
+    if(!started) return;
+    if(isPlaying) return;
 
     isPlaying = true;
     btnPlay.textContent = "PAUSE";
     btnPlay.classList.add("toggleOn");
+    btnPlay.classList.remove("toggleOff");
 
     stepIndex = 0;
     nextStepTime = audioCtx.currentTime + 0.06;
@@ -1438,68 +1511,93 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     isPlaying = false;
     btnPlay.textContent = "PLAY";
     btnPlay.classList.remove("toggleOn");
-
-    if(timerId){
-      clearInterval(timerId);
-      timerId = null;
-    }
+    btnPlay.classList.add("toggleOff");
+    if(timerId){ clearInterval(timerId); timerId = null; }
     stepIndex = 0;
     lcdStep.textContent = "1";
   }
 
   function togglePlay(){
+    if(!started) return;
     if(isPlaying) stopSequencer();
     else startSequencer();
   }
 
-  // ==========================
-  // METER
-  // ==========================
+  // ---------- Meter ----------
   const meterData = new Uint8Array(1024);
-
   function meterLoop(){
     if(analyser){
       analyser.getByteTimeDomainData(meterData);
       let sum = 0;
       for(let i=0;i<meterData.length;i++){
         const v = (meterData[i] - 128) / 128;
-        sum += v * v;
+        sum += v*v;
       }
       const rms = Math.sqrt(sum / meterData.length);
-      meterFill.style.width = Math.min(100, rms * 300) + "%";
+      const normalized = Math.min(1, rms * 2.8);
+      meterFill.style.width = (normalized * 100).toFixed(1) + "%";
     }
     requestAnimationFrame(meterLoop);
   }
-
-  // ==========================
-  // GROOVE BANK
-  // ==========================
+    // ---------- Groove bank ----------
   let grooveIndex = -1;
 
   const GROOVES = [
-    { name:"4x4 Minimal",
-      kick:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
-      snare:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
-      hat:[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-      bass:[1,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0]
+    {
+      name: "4x4 Minimal",
+      kick:  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1],
+      bass:  [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0],
+      sample:null
     },
-    { name:"Electro",
-      kick:[1,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0],
-      snare:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
-      hat:[0,1,1,0,0,1,1,0,0,1,1,0,0,1,1,0],
-      bass:[1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0]
+    {
+      name: "Electro Break",
+      kick:  [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,1,0, 0,1,1,0, 0,1,1,0, 0,1,1,0],
+      bass:  [1,0,0,1, 0,0,0,0, 1,0,0,1, 0,0,0,0],
+      sample:null
+    },
+    {
+      name: "UK Garage-ish",
+      kick:  [1,0,0,0, 0,0,1,0, 1,0,0,1, 0,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [1,0,1,0, 0,1,0,1, 1,0,1,0, 0,1,0,1],
+      bass:  [1,0,0,0, 0,1,0,0, 1,0,0,0, 0,1,0,0],
+      sample:null
+    },
+    {
+      name: "Half-Time",
+      kick:  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+      snare: [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+      hat:   [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1],
+      bass:  [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0],
+      sample:null
+    },
+    {
+      name: "Tech Shuffle",
+      kick:  [1,0,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,0,1, 1,0,1,0, 0,1,0,1, 1,0,1,0],
+      bass:  [1,0,0,0, 0,0,0,1, 1,0,0,0, 0,0,1,0],
+      sample:null
     }
   ];
 
   function applyGroove(g){
     const pat = pattern[currentPat];
-    pat.kick = g.kick.map(Boolean);
+
+    pat.kick  = g.kick.map(Boolean);
     pat.snare = g.snare.map(Boolean);
-    pat.hat = g.hat.map(Boolean);
-    pat.bass = g.bass.map(Boolean);
-    pat.sample = new Array(16).fill(false);
+    pat.hat   = g.hat.map(Boolean);
+    pat.bass  = g.bass.map(Boolean);
+
+    if (Array.isArray(g.sample) && sampleReady) pat.sample = g.sample.map(Boolean);
+    else pat.sample = new Array(16).fill(false);
+
     renderSteps();
-    presetStatus.textContent = "Groove: " + g.name;
+    presetStatus && (presetStatus.textContent = `Groove: ${g.name}`);
   }
 
   function nextGroove(){
@@ -1507,42 +1605,54 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     applyGroove(GROOVES[grooveIndex]);
   }
 
-  // ==========================
-  // PRESET SAVE / LOAD
-  // ==========================
-  const LS_KEY = "pocket-groove-final";
+  // ---------- Preset save/load ----------
+  const LS_KEY = "pocket-groove-v03";
 
   function savePreset(){
-    localStorage.setItem(LS_KEY, JSON.stringify({
-      pattern, bpm, swing, bassHz,
-      trimStartPct, pitchSemi, sampleFilterPct, sampleDecayMs
-    }));
-    presetStatus.textContent = "Preset salvato ✔";
+    const data = { pattern, currentPat, bpm, swing, bassHz, fxX, fxY, trimStartPct, pitchSemi, sampleFilterPct, sampleDecayMs };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    presetStatus.textContent = "Preset salvato in locale ✔";
   }
 
   function loadPreset(){
     const raw = localStorage.getItem(LS_KEY);
-    if(!raw){ presetStatus.textContent = "Nessun preset."; return; }
+    if(!raw){ presetStatus.textContent = "Nessun preset trovato."; return; }
+    try{
+      const data = JSON.parse(raw);
+      if(data.pattern) pattern = data.pattern;
+      if(data.currentPat) currentPat = data.currentPat;
+      if(typeof data.bpm === "number") bpm = data.bpm;
+      if(typeof data.swing === "number") swing = data.swing;
+      if(typeof data.bassHz === "number") bassHz = data.bassHz;
 
-    const d = JSON.parse(raw);
-    pattern = d.pattern;
-    bpm = d.bpm;
-    swing = d.swing;
-    bassHz = d.bassHz;
-    trimStartPct = d.trimStartPct;
-    pitchSemi = d.pitchSemi;
-    sampleFilterPct = d.sampleFilterPct;
-    sampleDecayMs = d.sampleDecayMs;
+      if(typeof data.fxX === "number") fxX = data.fxX;
+      if(typeof data.fxY === "number") fxY = data.fxY;
 
-    bpmSlider.value = bpm;
-    swingSlider.value = swing * 100;
-    bassNoteSel.value = bassHz;
+      if(typeof data.trimStartPct === "number") trimStartPct = data.trimStartPct;
+      if(typeof data.pitchSemi === "number") pitchSemi = data.pitchSemi;
+      if(typeof data.sampleFilterPct === "number") sampleFilterPct = data.sampleFilterPct;
+      if(typeof data.sampleDecayMs === "number") sampleDecayMs = data.sampleDecayMs;
 
-    updateSamplerLabels();
-    syncLCD();
-    renderSteps();
+      bpmSlider.value = String(bpm);
+      swingSlider.value = String(Math.round(swing * 100));
+      bassNoteSel.value = String(bassHz);
 
-    presetStatus.textContent = "Preset caricato ✔";
+      trimStartEl && (trimStartEl.value = String(Math.round(trimStartPct * 100)));
+      pitchSemiEl && (pitchSemiEl.value = String(pitchSemi));
+      sampleFilterEl && (sampleFilterEl.value = String(Math.round(sampleFilterPct * 100)));
+      sampleDecayEl && (sampleDecayEl.value = String(sampleDecayMs));
+      updateSamplerLabels();
+
+      syncLCD();
+      renderSteps();
+
+      setFxDot();
+      if(started) updateFx();
+
+      presetStatus.textContent = "Preset caricato ✔";
+    }catch(e){
+      presetStatus.textContent = "Errore nel preset.";
+    }
   }
 
   function resetPreset(){
@@ -1550,17 +1660,56 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
     presetStatus.textContent = "Preset eliminato.";
   }
 
-  // ==========================
-  // UI EVENTS
-  // ==========================
-  btnStartAudio.addEventListener("click", startAudio);
-  btnPlay.addEventListener("click", togglePlay);
-  btnStop.addEventListener("click", stopSequencer);
+  // ---------- Pattern tools ----------
+  function togglePattern(){
+    currentPat = (currentPat === "A") ? "B" : "A";
+    lcdPat.textContent = currentPat;
+    renderSteps();
+  }
 
-  btnGroove.addEventListener("click", nextGroove);
-  btnSave.addEventListener("click", savePreset);
-  btnLoad.addEventListener("click", loadPreset);
-  btnReset.addEventListener("click", resetPreset);
+  function clearPattern(){
+    const pat = pattern[currentPat];
+    Object.keys(pat).forEach(k => pat[k] = new Array(16).fill(false));
+    renderSteps();
+  }
+
+  function randomize(){
+    const pat = pattern[currentPat];
+    pat.kick   = pat.kick.map((_,i) => (i%4===0) ? true : Math.random() < 0.10);
+    pat.snare  = pat.snare.map((_,i) => (i===4||i===12) ? true : Math.random() < 0.06);
+    pat.hat    = pat.hat.map((_,i) => (i%2===1) ? (Math.random() < 0.85) : (Math.random() < 0.20));
+    pat.bass   = pat.bass.map(() => Math.random() < 0.22);
+    pat.sample = pat.sample.map(() => sampleReady ? (Math.random() < 0.10) : false);
+    renderSteps();
+    presetStatus && (presetStatus.textContent = "Random ✔");
+  }
+
+  // ---------- LCD sync ----------
+  function syncLCD(){
+    lcdBpm.textContent = String(bpm);
+    bpmVal.textContent = String(bpm);
+
+    const swPct = Math.round(swing * 100);
+    lcdSwing.textContent = swPct + "%";
+    swingVal.textContent = swPct + "%";
+
+    lcdPat.textContent = currentPat;
+  }
+
+  // ---------- Events ----------
+  btnStartAudio.addEventListener("click", async () => {
+    await startAudio();
+  });
+
+  btnPlay.addEventListener("click", () => {
+    if(!started){
+      presetStatus.textContent = "Tocca START AUDIO prima (Safari iOS).";
+      return;
+    }
+    togglePlay();
+  });
+
+  btnStop.addEventListener("click", () => stopSequencer());
 
   bpmSlider.addEventListener("input", () => {
     bpm = Number(bpmSlider.value);
@@ -1568,22 +1717,40 @@ button:disabled{ opacity:.45; cursor:not-allowed; }
   });
 
   swingSlider.addEventListener("input", () => {
-    swing = Number(swingSlider.value) / 100;
+    const pct = Number(swingSlider.value); // 0..65
+    swing = pct / 100;
     syncLCD();
   });
 
-  window.addEventListener("keydown", e => {
+  btnPattern.addEventListener("click", togglePattern);
+  btnClear.addEventListener("click", () => { clearPattern(); presetStatus.textContent = "Clear ✔"; });
+  btnRandom.addEventListener("click", randomize);
+  btnGroove && btnGroove.addEventListener("click", nextGroove);
+
+  btnSave.addEventListener("click", savePreset);
+  btnLoad.addEventListener("click", loadPreset);
+  btnReset.addEventListener("click", resetPreset);
+
+  // keyboard: space
+  window.addEventListener("keydown", (e) => {
     if(e.code === "Space"){
       e.preventDefault();
-      if(started) togglePlay();
+      if(!started) return;
+      togglePlay();
     }
-  });
+  }, { passive:false });
 
-  // ==========================
-  // INIT
-  // ==========================
+  // ---------- Init ----------
   buildTracksUI();
   syncLCD();
+
+  if(localStorage.getItem(LS_KEY)){
+    presetStatus.textContent = "Preset trovato: premi LOAD.";
+  }
+
   meterLoop();
   lcdStep.textContent = "1";
 })();
+  </script>
+</body>
+</html>
