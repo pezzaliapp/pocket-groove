@@ -112,7 +112,7 @@ Export WAV
 	4.	Premi SAVE WAV
 
 ⸻
-
+```
 Filosofia del progetto
 	•	Single file (index.html)
 	•	Nessuna dipendenza esterna
