@@ -3,88 +3,87 @@ PROPRIETARY SOFTWARE LICENSE
 ALL RIGHTS RESERVED
 
 Copyright © 2025 PezzaliAPP
-Autore: Alessandro Pezzali
+Author: Alessandro Pezzali
 
 ────────────────────────────────────────────
-1. NATURA DEL SOFTWARE
+1. SOFTWARE NATURE
 ────────────────────────────────────────────
-Pocket Groove è un software PROPRIETARIO.
-Il presente software non è open source e non è distribuito sotto
-alcuna licenza libera o permissiva.
+Pocket Groove is proprietary software.
 
-Il software comprende, a titolo esemplificativo ma non esaustivo:
-– codice sorgente
-– struttura e architettura del programma
-– interfaccia grafica e design
-– logiche audio, musicali e algoritmiche
-– preset, patch, configurazioni e workflow
-– documentazione e materiali associati
+This software is NOT open source and is NOT released under any
+free, permissive, or open license.
 
-Tutti i diritti sono riservati all’autore.
+The Software includes, without limitation:
+– source code
+– software architecture and structure
+– graphical user interface and design
+– audio, musical and algorithmic logic
+– presets, configurations, workflows
+– documentation and related materials
 
-────────────────────────────────────────────
-2. DIRITTI CONCESSI
-────────────────────────────────────────────
-All’utente è concesso esclusivamente il diritto di:
-– utilizzare il software per uso personale e/o dimostrativo
-– eseguire il software così com’è, senza modificarlo
-
-Nessun altro diritto è concesso, espresso o implicito.
+All rights are exclusively reserved by the Author.
 
 ────────────────────────────────────────────
-3. DIVIETI ESPRESSI
+2. GRANT OF RIGHTS
 ────────────────────────────────────────────
-È ESPRESSAMENTE VIETATO, senza preventiva autorizzazione scritta
-dell’autore:
+The user is granted a limited, non-exclusive, non-transferable right
+to use the Software solely for personal and/or demonstrative purposes.
 
-1) copiare, riprodurre o duplicare il software, in tutto o in parte;
-2) modificare, adattare, tradurre o creare opere derivate;
-3) distribuire, pubblicare, vendere, concedere in licenza,
-   sublicenziare o rendere disponibile il software a terzi;
-4) riutilizzare parti del codice, delle logiche o del design
-   in altri progetti, commerciali o non commerciali;
-5) effettuare reverse engineering, decompilazione o disassemblaggio,
-   nei limiti massimi consentiti dalla legge;
-6) utilizzare il software come base o riferimento diretto
-   per prodotti concorrenti o simili.
+The Software must be used strictly “as is” and without modification.
+
+No other rights are granted, whether express or implied.
 
 ────────────────────────────────────────────
-4. PROPRIETÀ INTELLETTUALE
+3. EXPRESS PROHIBITIONS
 ────────────────────────────────────────────
-Il software è protetto dalle leggi sul diritto d’autore,
-dalla normativa sulla proprietà intellettuale e da ogni altra
-legge applicabile.
+Unless expressly authorized in writing by the Author, it is strictly prohibited to:
 
-La titolarità esclusiva di tutti i diritti resta dell’autore.
-
-────────────────────────────────────────────
-5. ASSENZA DI GARANZIA
-────────────────────────────────────────────
-Il software è fornito “COSÌ COM’È”, senza garanzie di alcun tipo,
-esplicite o implicite, incluse (ma non limitate a) garanzie di:
-– commerciabilità
-– idoneità per uno scopo particolare
-– assenza di errori o interruzioni
-
-L’autore non potrà essere ritenuto responsabile per danni diretti,
-indiretti o consequenziali derivanti dall’uso del software.
+1. copy, reproduce, duplicate or redistribute the Software, in whole or in part;
+2. modify, adapt, translate or create derivative works;
+3. sell, sublicense, publish or make the Software available to third parties;
+4. reuse any part of the code, logic, structure or design in other projects,
+   whether commercial or non-commercial;
+5. reverse engineer, decompile or disassemble the Software, to the maximum
+   extent permitted by law;
+6. use the Software as a base, reference or model for competing or similar products.
 
 ────────────────────────────────────────────
-6. RISOLUZIONE
+4. INTELLECTUAL PROPERTY
 ────────────────────────────────────────────
-Qualsiasi violazione dei termini della presente licenza comporta
-l’immediata decadenza del diritto di utilizzo del software.
+The Software is protected by copyright laws, intellectual property
+laws and international treaties.
+
+All intellectual property rights remain the exclusive property of the Author.
 
 ────────────────────────────────────────────
-7. AUTORIZZAZIONI SPECIALI
+5. DISCLAIMER OF WARRANTY
 ────────────────────────────────────────────
-Qualsiasi utilizzo non espressamente consentito deve essere
-preventivamente autorizzato per iscritto dall’autore.
+The Software is provided “AS IS”, without warranty of any kind,
+express or implied, including but not limited to warranties of:
+– merchantability
+– fitness for a particular purpose
+– absence of defects or interruptions
 
-Per richieste di licenza, collaborazioni o utilizzi commerciali:
+In no event shall the Author be liable for any damages arising from
+the use or inability to use the Software.
+
+────────────────────────────────────────────
+6. TERMINATION
+────────────────────────────────────────────
+Any violation of this License shall result in the immediate termination
+of the right to use the Software.
+
+────────────────────────────────────────────
+7. SPECIAL PERMISSIONS
+────────────────────────────────────────────
+Any use not expressly permitted by this License requires prior written
+authorization from the Author.
+
+For licensing inquiries or commercial use:
 PezzaliAPP / Alessandro Pezzali
 
 ────────────────────────────────────────────
-8. LEGGE APPLICABILE
+8. GOVERNING LAW
 ────────────────────────────────────────────
-La presente licenza è regolata dalla legge italiana.
+This License shall be governed by and construed in accordance with
+Italian law.
