@@ -191,8 +191,7 @@
       line-height:1.35;
       margin-top:10px;
     }
-
-    /* TRACKS / SEQUENCER */
+        /* TRACKS / SEQUENCER */
     .seq{ padding:12px 14px 16px; }
     .tracks{ display:grid; gap:10px; margin-bottom:12px; }
     .track{
@@ -360,8 +359,9 @@
 
             <div class="btnRow">
               <button id="btnPattern" class="tiny ghost" type="button">PATTERN A/B</button>
-              <button id="btnClear" class="tiny danger" type="button">CLEAR</button>
+              <button id="btnGroove" class="tiny primary" type="button">GROOVE</button>
               <button id="btnRandom" class="tiny" type="button">RANDOM</button>
+              <button id="btnClear" class="tiny danger" type="button">CLEAR</button>
             </div>
           </div>
         </div>
@@ -517,7 +517,7 @@
             <h3>About</h3>
             <div class="smallNote">
               Prototype by PezzaliAPP • WebAudio • GitHub Pages ready.<br/>
-              Funzioni: FX XY, Sampler Mic, Export WAV.
+              Funzioni: FX XY, Sampler Mic, Export WAV, Groove presets.
             </div>
           </div>
 
@@ -580,10 +580,6 @@
   const scheduleAheadSec = 0.12;
   let timerId = null;
 
-  // transport safety (fix STOP/PLAY)
-  let transportGen = 0;
-  let uiTimers = [];
-
   // audio
   let audioCtx = null;
   let master = null;
@@ -612,6 +608,7 @@
   const swingVal = document.getElementById("swingVal");
 
   const btnPattern = document.getElementById("btnPattern");
+  const btnGroove  = document.getElementById("btnGroove");
   const btnClear = document.getElementById("btnClear");
   const btnRandom = document.getElementById("btnRandom");
 
@@ -629,7 +626,8 @@
   const recStatus = document.getElementById("recStatus");
   const recTimer = document.getElementById("recTimer");
   const wavDownload = document.getElementById("wavDownload");
-    // ---------- Bass selector ----------
+
+  // ---------- Bass selector ----------
   if (bassNoteSel) {
     bassNoteSel.addEventListener("change", () => {
       bassHz = Number(bassNoteSel.value) || bassHz;
@@ -785,24 +783,22 @@
     window.__PG_FX__ = { filter, stutterGain };
     window.__PG_REC_SRC__ = stutterGain; // recorder tap (post-FX)
 
+    // update UI
     setTimeout(() => updateFx(), 0);
-  }
-
-  async function resumeAudioIfNeeded(){
-    ensureAudio();
-    if (!audioCtx) return;
-    if (audioCtx.state !== "running") {
-      try { await audioCtx.resume(); } catch {}
-    }
   }
 
   async function startAudio(){
     ensureAudio();
-    await resumeAudioIfNeeded();
+    if(audioCtx.state !== "running"){
+      await audioCtx.resume();
+    }
     started = true;
     btnStartAudio.textContent = "AUDIO OK";
     btnStartAudio.classList.add("toggleOn");
     btnStartAudio.disabled = true;
+
+    // sync FX to audio when ready
+    updateFx();
   }
     // =========================
   // Record WAV (output post-FX)
@@ -851,9 +847,11 @@
     recZero = audioCtx.createGain();
     recZero.gain.value = 0.0;
 
+    // keep alive
     recNode.connect(recZero);
     recZero.connect(audioCtx.destination);
 
+    // tap post-FX
     src.connect(recNode);
 
     recNode.onaudioprocess = (e) => {
@@ -997,7 +995,8 @@
   btnRec && btnRec.addEventListener("click", recStart);
   btnRecStop && btnRecStop.addEventListener("click", recStop);
   btnRecSave && btnRecSave.addEventListener("click", recSave);
-    // =====================
+
+  // =====================
   // Sampler (Mic) - 1 slot
   // =====================
   const btnMicArm   = document.getElementById("btnMicArm");
@@ -1105,9 +1104,11 @@
     URL.revokeObjectURL(url);
   }
 
+  let monitorListenerBound = false;
+
   async function armMic(){
     try{
-      await startAudio();
+      await startAudio(); // must be user gesture
 
       if(!navigator.mediaDevices?.getUserMedia){
         micStatus && (micStatus.textContent = "getUserMedia non disponibile su questo browser.");
@@ -1134,19 +1135,24 @@
 
       micWorklet.port.onmessage = (e) => {
         if(!micRecording) return;
-        const chunk = e.data;
+        const chunk = e.data; // Float32Array
         micRecChunks.push(new Float32Array(chunk));
         micRecLen += chunk.length;
       };
 
       micSrc.connect(micWorklet);
 
+      // optional monitor into master (post-synth, pre-FX)
       micSrc.connect(micMonitorGain);
       micMonitorGain.connect(master);
 
-      chkMonitor && chkMonitor.addEventListener("change", () => {
-        micMonitorGain.gain.value = chkMonitor.checked ? 0.8 : 0.0;
-      });
+      if(chkMonitor && !monitorListenerBound){
+        chkMonitor.addEventListener("change", () => {
+          if(!micMonitorGain) return;
+          micMonitorGain.gain.value = chkMonitor.checked ? 0.8 : 0.0;
+        });
+        monitorListenerBound = true;
+      }
 
       micRecSampleRate = audioCtx.sampleRate;
       micArmed = true;
@@ -1218,6 +1224,7 @@
     const src = audioCtx.createBufferSource();
     src.buffer = sampleBuf;
 
+    // pitch in semitones
     const rate = Math.pow(2, pitchSemi / 12);
     src.playbackRate.setValueAtTime(rate, when);
 
@@ -1463,7 +1470,7 @@
     return 0;
   }
 
-  function scheduleStep(step, time, gen){
+  function scheduleStep(step, time){
     const pat = pattern[currentPat];
     if(pat.kick[step])   triggerKick(time);
     if(pat.snare[step])  triggerSnare(time);
@@ -1471,70 +1478,49 @@
     if(pat.bass[step])   triggerBass(time);
     if(pat.sample[step]) triggerSample(time);
 
-    // UI: cancella flash tardivi dopo STOP
     const uiDelay = Math.max(0, (time - audioCtx.currentTime) * 1000);
-    const tId = setTimeout(() => {
-      if(!isPlaying) return;
-      if(gen !== transportGen) return;
-      flashPlayhead(step);
-    }, uiDelay);
-    uiTimers.push(tId);
+    setTimeout(() => flashPlayhead(step), uiDelay);
   }
 
-  async function startSequencer(){
+  function scheduler(){
+    if(!isPlaying) return;
+    while(nextStepTime < audioCtx.currentTime + scheduleAheadSec){
+      const offset = swingOffsetForStep(stepIndex);
+      scheduleStep(stepIndex, nextStepTime + offset);
+      stepIndex = (stepIndex + 1) % 16;
+      nextStepTime += secondsPerStep();
+    }
+  }
+
+  function startSequencer(){
     ensureAudio();
     if(!started) return;
     if(isPlaying) return;
 
-    await resumeAudioIfNeeded();
-
-    // safety: kill vecchi timer
-    if(timerId){ clearInterval(timerId); timerId = null; }
-    uiTimers.forEach(clearTimeout);
-    uiTimers = [];
-
-    transportGen++;
     isPlaying = true;
-
     btnPlay.textContent = "PAUSE";
     btnPlay.classList.add("toggleOn");
     btnPlay.classList.remove("toggleOff");
 
     stepIndex = 0;
     nextStepTime = audioCtx.currentTime + 0.06;
-
-    timerId = setInterval(() => {
-      if(!isPlaying) return;
-      while(nextStepTime < audioCtx.currentTime + scheduleAheadSec){
-        const offset = swingOffsetForStep(stepIndex);
-        scheduleStep(stepIndex, nextStepTime + offset, transportGen);
-        stepIndex = (stepIndex + 1) % 16;
-        nextStepTime += secondsPerStep();
-      }
-    }, lookaheadMs);
+    timerId = setInterval(scheduler, lookaheadMs);
   }
 
   function stopSequencer(){
     isPlaying = false;
-    transportGen++;
-
     btnPlay.textContent = "PLAY";
     btnPlay.classList.remove("toggleOn");
     btnPlay.classList.add("toggleOff");
-
     if(timerId){ clearInterval(timerId); timerId = null; }
-
-    uiTimers.forEach(clearTimeout);
-    uiTimers = [];
-
     stepIndex = 0;
     lcdStep.textContent = "1";
   }
 
-  async function togglePlay(){
+  function togglePlay(){
     if(!started) return;
     if(isPlaying) stopSequencer();
-    else await startSequencer();
+    else startSequencer();
   }
 
   // ---------- Meter ----------
@@ -1553,9 +1539,74 @@
     }
     requestAnimationFrame(meterLoop);
   }
+    // ---------- Groove bank ----------
+  let grooveIndex = -1;
+
+  const GROOVES = [
+    {
+      name: "4x4 Minimal",
+      kick:  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1],
+      bass:  [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0],
+      sample:null
+    },
+    {
+      name: "Electro Break",
+      kick:  [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,1,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,1,0, 0,1,1,0, 0,1,1,0, 0,1,1,0],
+      bass:  [1,0,0,1, 0,0,0,0, 1,0,0,1, 0,0,0,0],
+      sample:null
+    },
+    {
+      name: "UK Garage-ish",
+      kick:  [1,0,0,0, 0,0,1,0, 1,0,0,1, 0,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [1,0,1,0, 0,1,0,1, 1,0,1,0, 0,1,0,1],
+      bass:  [1,0,0,0, 0,1,0,0, 1,0,0,0, 0,1,0,0],
+      sample:null
+    },
+    {
+      name: "Half-Time",
+      kick:  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+      snare: [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0],
+      hat:   [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1],
+      bass:  [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0],
+      sample:null
+    },
+    {
+      name: "Tech Shuffle",
+      kick:  [1,0,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0],
+      snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
+      hat:   [0,1,0,1, 1,0,1,0, 0,1,0,1, 1,0,1,0],
+      bass:  [1,0,0,0, 0,0,0,1, 1,0,0,0, 0,0,1,0],
+      sample:null
+    }
+  ];
+
+  function applyGroove(g){
+    const pat = pattern[currentPat];
+
+    pat.kick  = g.kick.map(Boolean);
+    pat.snare = g.snare.map(Boolean);
+    pat.hat   = g.hat.map(Boolean);
+    pat.bass  = g.bass.map(Boolean);
+
+    if (Array.isArray(g.sample) && sampleReady) pat.sample = g.sample.map(Boolean);
+    else pat.sample = new Array(16).fill(false);
+
+    renderSteps();
+    presetStatus && (presetStatus.textContent = `Groove: ${g.name}`);
+  }
+
+  function nextGroove(){
+    grooveIndex = (grooveIndex + 1) % GROOVES.length;
+    applyGroove(GROOVES[grooveIndex]);
+  }
 
   // ---------- Preset save/load ----------
-  const LS_KEY = "pocket-groove-v02";
+  const LS_KEY = "pocket-groove-v03";
 
   function savePreset(){
     const data = { pattern, currentPat, bpm, swing, bassHz, fxX, fxY, trimStartPct, pitchSemi, sampleFilterPct, sampleDecayMs };
@@ -1630,6 +1681,7 @@
     pat.bass   = pat.bass.map(() => Math.random() < 0.22);
     pat.sample = pat.sample.map(() => sampleReady ? (Math.random() < 0.10) : false);
     renderSteps();
+    presetStatus && (presetStatus.textContent = "Random ✔");
   }
 
   // ---------- LCD sync ----------
@@ -1643,17 +1695,18 @@
 
     lcdPat.textContent = currentPat;
   }
-    // ---------- Events ----------
+
+  // ---------- Events ----------
   btnStartAudio.addEventListener("click", async () => {
     await startAudio();
   });
 
-  btnPlay.addEventListener("click", async () => {
+  btnPlay.addEventListener("click", () => {
     if(!started){
       presetStatus.textContent = "Tocca START AUDIO prima (Safari iOS).";
       return;
     }
-    await togglePlay();
+    togglePlay();
   });
 
   btnStop.addEventListener("click", () => stopSequencer());
@@ -1670,19 +1723,20 @@
   });
 
   btnPattern.addEventListener("click", togglePattern);
-  btnClear.addEventListener("click", clearPattern);
+  btnClear.addEventListener("click", () => { clearPattern(); presetStatus.textContent = "Clear ✔"; });
   btnRandom.addEventListener("click", randomize);
+  btnGroove && btnGroove.addEventListener("click", nextGroove);
 
   btnSave.addEventListener("click", savePreset);
   btnLoad.addEventListener("click", loadPreset);
   btnReset.addEventListener("click", resetPreset);
 
   // keyboard: space
-  window.addEventListener("keydown", async (e) => {
+  window.addEventListener("keydown", (e) => {
     if(e.code === "Space"){
       e.preventDefault();
       if(!started) return;
-      await togglePlay();
+      togglePlay();
     }
   }, { passive:false });
 
@@ -1697,6 +1751,6 @@
   meterLoop();
   lcdStep.textContent = "1";
 })();
-</script>
+  </script>
 </body>
 </html>
