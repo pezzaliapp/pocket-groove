@@ -461,8 +461,7 @@
               Bass mono "una nota" pensata per minimal: cambia la nota e crea pattern ipnotici.
             </div>
           </div>
-
-          <!-- SAMPLER MIC -->
+                    <!-- SAMPLER MIC -->
           <div class="box">
             <h3>Sampler (Mic)</h3>
 
@@ -530,7 +529,7 @@
       </div>
     </div>
   </div>
-  <script>
+    <script>
 (() => {
   "use strict";
 
@@ -580,6 +579,10 @@
   const lookaheadMs = 25;
   const scheduleAheadSec = 0.12;
   let timerId = null;
+
+  // transport safety (fix STOP/PLAY)
+  let transportGen = 0;
+  let uiTimers = [];
 
   // audio
   let audioCtx = null;
@@ -782,15 +785,20 @@
     window.__PG_FX__ = { filter, stutterGain };
     window.__PG_REC_SRC__ = stutterGain; // recorder tap (post-FX)
 
-    // update UI
     setTimeout(() => updateFx(), 0);
+  }
+
+  async function resumeAudioIfNeeded(){
+    ensureAudio();
+    if (!audioCtx) return;
+    if (audioCtx.state !== "running") {
+      try { await audioCtx.resume(); } catch {}
+    }
   }
 
   async function startAudio(){
     ensureAudio();
-    if(audioCtx.state !== "running"){
-      await audioCtx.resume();
-    }
+    await resumeAudioIfNeeded();
     started = true;
     btnStartAudio.textContent = "AUDIO OK";
     btnStartAudio.classList.add("toggleOn");
@@ -843,11 +851,9 @@
     recZero = audioCtx.createGain();
     recZero.gain.value = 0.0;
 
-    // keep alive
     recNode.connect(recZero);
     recZero.connect(audioCtx.destination);
 
-    // tap post-FX
     src.connect(recNode);
 
     recNode.onaudioprocess = (e) => {
@@ -1081,7 +1087,6 @@
     ensureAudio();
     if(!audioCtx) return;
 
-    // Create AudioWorkletProcessor from Blob (single file)
     const code = `
       class MicTapProcessor extends AudioWorkletProcessor {
         process(inputs) {
@@ -1102,7 +1107,7 @@
 
   async function armMic(){
     try{
-      await startAudio(); // must be user gesture
+      await startAudio();
 
       if(!navigator.mediaDevices?.getUserMedia){
         micStatus && (micStatus.textContent = "getUserMedia non disponibile su questo browser.");
@@ -1129,14 +1134,13 @@
 
       micWorklet.port.onmessage = (e) => {
         if(!micRecording) return;
-        const chunk = e.data; // Float32Array
+        const chunk = e.data;
         micRecChunks.push(new Float32Array(chunk));
         micRecLen += chunk.length;
       };
 
       micSrc.connect(micWorklet);
 
-      // optional monitor into master (post-synth, pre-FX)
       micSrc.connect(micMonitorGain);
       micMonitorGain.connect(master);
 
@@ -1214,7 +1218,6 @@
     const src = audioCtx.createBufferSource();
     src.buffer = sampleBuf;
 
-    // pitch in semitones
     const rate = Math.pow(2, pitchSemi / 12);
     src.playbackRate.setValueAtTime(rate, when);
 
@@ -1460,7 +1463,7 @@
     return 0;
   }
 
-  function scheduleStep(step, time){
+  function scheduleStep(step, time, gen){
     const pat = pattern[currentPat];
     if(pat.kick[step])   triggerKick(time);
     if(pat.snare[step])  triggerSnare(time);
@@ -1468,49 +1471,70 @@
     if(pat.bass[step])   triggerBass(time);
     if(pat.sample[step]) triggerSample(time);
 
+    // UI: cancella flash tardivi dopo STOP
     const uiDelay = Math.max(0, (time - audioCtx.currentTime) * 1000);
-    setTimeout(() => flashPlayhead(step), uiDelay);
+    const tId = setTimeout(() => {
+      if(!isPlaying) return;
+      if(gen !== transportGen) return;
+      flashPlayhead(step);
+    }, uiDelay);
+    uiTimers.push(tId);
   }
 
-  function scheduler(){
-    if(!isPlaying) return;
-    while(nextStepTime < audioCtx.currentTime + scheduleAheadSec){
-      const offset = swingOffsetForStep(stepIndex);
-      scheduleStep(stepIndex, nextStepTime + offset);
-      stepIndex = (stepIndex + 1) % 16;
-      nextStepTime += secondsPerStep();
-    }
-  }
-
-  function startSequencer(){
+  async function startSequencer(){
     ensureAudio();
     if(!started) return;
     if(isPlaying) return;
 
+    await resumeAudioIfNeeded();
+
+    // safety: kill vecchi timer
+    if(timerId){ clearInterval(timerId); timerId = null; }
+    uiTimers.forEach(clearTimeout);
+    uiTimers = [];
+
+    transportGen++;
     isPlaying = true;
+
     btnPlay.textContent = "PAUSE";
     btnPlay.classList.add("toggleOn");
     btnPlay.classList.remove("toggleOff");
 
     stepIndex = 0;
     nextStepTime = audioCtx.currentTime + 0.06;
-    timerId = setInterval(scheduler, lookaheadMs);
+
+    timerId = setInterval(() => {
+      if(!isPlaying) return;
+      while(nextStepTime < audioCtx.currentTime + scheduleAheadSec){
+        const offset = swingOffsetForStep(stepIndex);
+        scheduleStep(stepIndex, nextStepTime + offset, transportGen);
+        stepIndex = (stepIndex + 1) % 16;
+        nextStepTime += secondsPerStep();
+      }
+    }, lookaheadMs);
   }
 
   function stopSequencer(){
     isPlaying = false;
+    transportGen++;
+
     btnPlay.textContent = "PLAY";
     btnPlay.classList.remove("toggleOn");
     btnPlay.classList.add("toggleOff");
+
     if(timerId){ clearInterval(timerId); timerId = null; }
+
+    uiTimers.forEach(clearTimeout);
+    uiTimers = [];
+
     stepIndex = 0;
     lcdStep.textContent = "1";
   }
 
-  function togglePlay(){
+  async function togglePlay(){
     if(!started) return;
     if(isPlaying) stopSequencer();
-    else startSequencer();
+    else await startSequencer();
   }
 
   // ---------- Meter ----------
@@ -1571,7 +1595,6 @@
       syncLCD();
       renderSteps();
 
-      // FX UI + audio
       setFxDot();
       if(started) updateFx();
 
@@ -1625,12 +1648,12 @@
     await startAudio();
   });
 
-  btnPlay.addEventListener("click", () => {
+  btnPlay.addEventListener("click", async () => {
     if(!started){
       presetStatus.textContent = "Tocca START AUDIO prima (Safari iOS).";
       return;
     }
-    togglePlay();
+    await togglePlay();
   });
 
   btnStop.addEventListener("click", () => stopSequencer());
@@ -1655,11 +1678,11 @@
   btnReset.addEventListener("click", resetPreset);
 
   // keyboard: space
-  window.addEventListener("keydown", (e) => {
+  window.addEventListener("keydown", async (e) => {
     if(e.code === "Space"){
       e.preventDefault();
       if(!started) return;
-      togglePlay();
+      await togglePlay();
     }
   }, { passive:false });
 
