@@ -1,89 +1,32 @@
-POCKET GROOVE
-PROPRIETARY SOFTWARE LICENSE
-ALL RIGHTS RESERVED
+GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
 
-Copyright © 2025 PezzaliAPP
-Author: Alessandro Pezzali
+Copyright (C) 2025 Alessandro Pezzali – PezzaliAPP
 
-────────────────────────────────────────────
-1. SOFTWARE NATURE
-────────────────────────────────────────────
-Pocket Groove is proprietary software.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This software is NOT open source and is NOT released under any
-free, permissive, or open license.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Affero General Public License for more details.
 
-The Software includes, without limitation:
-– source code
-– software architecture and structure
-– graphical user interface and design
-– audio, musical and algorithmic logic
-– presets, configurations, workflows
-– documentation and related materials
+You should have received a copy of the GNU Affero General Public License
+along with this program.
+If not, see <https://www.gnu.org/licenses/>.
 
-All rights are exclusively reserved by the Author.
+-----------------------------------------------------------------------
 
-────────────────────────────────────────────
-2. GRANT OF RIGHTS
-────────────────────────────────────────────
-The user is granted a limited, non-exclusive, non-transferable right
-to use the Software solely for personal and/or demonstrative purposes.
+ADDITIONAL NOTICE
 
-The Software must be used strictly “as is” and without modification.
+Pocket Groove is a browser-based audio application built entirely
+with Web Audio API and client-side technologies.
 
-No other rights are granted, whether express or implied.
+If you modify this software and make it available to users
+over a network (including web hosting), you are required to
+provide access to the complete corresponding source code,
+as stated in Section 13 of the AGPLv3.
 
-────────────────────────────────────────────
-3. EXPRESS PROHIBITIONS
-────────────────────────────────────────────
-Unless expressly authorized in writing by the Author, it is strictly prohibited to:
-
-1. copy, reproduce, duplicate or redistribute the Software, in whole or in part;
-2. modify, adapt, translate or create derivative works;
-3. sell, sublicense, publish or make the Software available to third parties;
-4. reuse any part of the code, logic, structure or design in other projects,
-   whether commercial or non-commercial;
-5. reverse engineer, decompile or disassemble the Software, to the maximum
-   extent permitted by law;
-6. use the Software as a base, reference or model for competing or similar products.
-
-────────────────────────────────────────────
-4. INTELLECTUAL PROPERTY
-────────────────────────────────────────────
-The Software is protected by copyright laws, intellectual property
-laws and international treaties.
-
-All intellectual property rights remain the exclusive property of the Author.
-
-────────────────────────────────────────────
-5. DISCLAIMER OF WARRANTY
-────────────────────────────────────────────
-The Software is provided “AS IS”, without warranty of any kind,
-express or implied, including but not limited to warranties of:
-– merchantability
-– fitness for a particular purpose
-– absence of defects or interruptions
-
-In no event shall the Author be liable for any damages arising from
-the use or inability to use the Software.
-
-────────────────────────────────────────────
-6. TERMINATION
-────────────────────────────────────────────
-Any violation of this License shall result in the immediate termination
-of the right to use the Software.
-
-────────────────────────────────────────────
-7. SPECIAL PERMISSIONS
-────────────────────────────────────────────
-Any use not expressly permitted by this License requires prior written
-authorization from the Author.
-
-For licensing inquiries or commercial use:
-PezzaliAPP / Alessandro Pezzali
-
-────────────────────────────────────────────
-8. GOVERNING LAW
-────────────────────────────────────────────
-This License shall be governed by and construed in accordance with
-Italian law.
+-----------------------------------------------------------------------
