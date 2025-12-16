@@ -1,71 +1,85 @@
 # Pocket Groove
 
-**Pocket Groove** è un prototipo **single-file** (unico `index.html`) di una mini **groovebox / sequencer 16-step** basata su **Web Audio API**, progettata per sperimentare pattern minimal, workflow “touch-first” e sound design essenziale direttamente nel browser.
+Pocket Groove è un prototipo **single-file** (un unico `index.html`) di una mini groovebox / sequencer **16-step** basata su **Web Audio API**.
 
-Il progetto nasce come laboratorio creativo e tecnico: niente build system, nessuna dipendenza esterna, tutto in un solo file.
+Il progetto è pensato come laboratorio di sperimentazione per pattern minimal, groove essenziali e workflow “touch-first”.
+
+Tutto il codice vive in un solo file HTML.
 
 ---
 
 ## Funzioni principali
 
-- **Sequencer 16-step** con 5 tracce:
+- Sequencer 16-step con 5 tracce:
   - Kick
   - Snare
   - Hat
   - Bass (oscillatore mono)
   - Sample (da microfono)
+
 - Controlli globali:
-  - **BPM**
-  - **Swing**
-  - **Pattern A / B**
-  - **Clear**
-  - **Random**
-  - **Groove presets**
-- **Preset**
-  - Save / Load / Reset (via `localStorage`)
-- **FX XY Pad**
-  - Asse X → Filtro passa-basso
-  - Asse Y → Stutter / Gate ritmico
-  - Modalità Hold + Reset
-- **Sampler da microfono**
-  - ARM MIC → REC / STOP → USE AS SAMPLE
-  - Trim start
-  - Pitch (±12 semitoni)
-  - Filtro
+  - BPM
+  - Swing
+  - Pattern A / B
+  - Clear
+  - Random
+  - Groove presets
+
+- Preset:
+  - Save
+  - Load
+  - Reset (localStorage)
+
+- FX XY Pad:
+  - Asse X: filtro passa-basso
+  - Asse Y: stutter / gate ritmico
+  - Hold FX
+  - Reset FX
+
+- Sampler Microfono:
+  - ARM MIC
+  - REC / STOP
+  - USE AS SAMPLE
+  - Start Trim
+  - Pitch
+  - Filter
   - Decay
-  - Monitor diretto
-- **Export WAV**
-  - Registrazione dell’output **post-FX**
+  - Monitor
+
+- Export WAV:
+  - Registrazione output post-FX
   - REC / STOP / SAVE WAV
 
 ---
 
 ## Requisiti
 
-- Browser moderno con supporto **Web Audio API**
+- Browser con supporto Web Audio API:
   - Safari iOS
   - Safari macOS
-  - Chrome / Edge / Firefox (desktop)
-- Per Safari / iOS:
-  - è **obbligatoria una gesture utente** (clic) per:
-    - avviare l’audio
-    - autorizzare il microfono
+  - Chrome
+  - Edge
+  - Firefox (desktop)
+
+- Su Safari / iOS è richiesta una gesture utente per:
+  - avviare l’audio
+  - autorizzare il microfono
 
 ---
 
 ## Avvio rapido
 
 ### Opzione A — Apertura diretta
-Apri `index.html` nel browser.
 
-> ⚠️ Nota  
-> Alcune funzioni (microfono, AudioWorklet) possono richiedere HTTPS o `localhost`.
+Apri il file `index.html` nel browser.
+
+Nota: alcune funzioni (microfono, AudioWorklet) possono richiedere HTTPS o localhost.
 
 ---
 
 ### Opzione B — Server locale (consigliato)
 
-Dalla cartella del progetto:
+Dalla cartella del progetto esegui:
 
 ```bash
 python3 -m http.server 8080
@@ -77,41 +91,47 @@ http://localhost:8080
 
 ⸻
 
-Uso
+Utilizzo
+
+Sequencer
 	1.	Premi START AUDIO
 	2.	Premi PLAY
 	3.	Tocca gli step per programmare il groove
-	4.	Per usare il sampler:
-	•	ARM MIC → autorizza il microfono
-	•	REC → registra un suono o una voce
-	•	STOP
-	•	USE AS SAMPLE
-	•	Attiva gli step sulla traccia SAMPLE
-	5.	Per esportare l’audio:
-	•	Record WAV
-	•	REC → STOP → SAVE WAV
+
+Sampler
+	1.	Premi ARM MIC e autorizza il microfono
+	2.	Premi REC e registra un suono o una voce
+	3.	Premi STOP
+	4.	Premi USE AS SAMPLE
+	5.	Attiva gli step sulla traccia SAMPLE
+
+Export WAV
+	1.	Vai alla sezione Record WAV
+	2.	Premi REC
+	3.	Premi STOP
+	4.	Premi SAVE WAV
 
 ⸻
 
 Filosofia del progetto
 	•	Single file (index.html)
-	•	Zero dipendenze
-	•	Web Audio API “raw”
+	•	Nessuna dipendenza esterna
+	•	Web Audio API usata in modo diretto
 	•	Pensato per:
 	•	sperimentazione
-	•	prototipazione
-	•	performance veloci
-	•	studio del timing e del groove
+	•	prototipazione rapida
+	•	studio del groove
+	•	performance leggere in browser
 
 ⸻
 
-Roadmap (idee future)
+Roadmap
 	•	Modalità PWA offline-ready
 	•	Libreria di groove e preset
 	•	Export / import pattern (JSON)
 	•	Visualizzazione waveform del sample
-	•	Slice e retrigger del sample
-	•	Versione hardware DIY (concept)
+	•	Slice del sample
+	•	Concept hardware DIY
 
 ⸻
 
