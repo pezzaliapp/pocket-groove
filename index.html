@@ -1142,78 +1142,100 @@
 
       micSrc.connect(micWorklet);
 
-      // optional monitor into master (post-synth, pre-FX)
-      micSrc.connect(micMonitorGain);
-      micMonitorGain.connect(master);
+    // optional monitor into master (post-synth, pre-FX)
+micSrc.connect(micMonitorGain);
+micMonitorGain.connect(master);
 
-      if(chkMonitor && !monitorListenerBound){
-        chkMonitor.addEventListener("change", () => {
-          if(!micMonitorGain) return;
-          micMonitorGain.gain.value = chkMonitor.checked ? 0.8 : 0.0;
-        });
-        monitorListenerBound = true;
-      }
+if (chkMonitor && !monitorListenerBound) {
+  chkMonitor.addEventListener("change", () => {
+    if (!micMonitorGain) return;
+    micMonitorGain.gain.value = chkMonitor.checked ? 0.8 : 0.0;
+  });
+  monitorListenerBound = true;
+}
 
-      micRecSampleRate = audioCtx.sampleRate;
-      micArmed = true;
-      micStatus && (micStatus.textContent = "Mic pronto. Premi REC (consigliato: 1–5 secondi).");
-      setSamplerUIState();
-    }catch(err){
-      console.error(err);
-      micArmed = false;
-      micStatus && (micStatus.textContent = "Permesso microfono negato o errore.");
-      setSamplerUIState();
-    }
+micRecSampleRate = audioCtx.sampleRate;
+micArmed = true;
+micStatus && (micStatus.textContent = "Mic pronto. Premi REC (consigliato: 1–5 secondi).");
+setSamplerUIState();
+
+} catch (err) {
+  console.error(err);
+  micArmed = false;
+  micStatus && (micStatus.textContent = "Permesso microfono negato o errore.");
+  setSamplerUIState();
+}
+}
+
+// =======================
+// MIC RECORD
+// =======================
+function micRecStart() {
+  if (!micArmed || micRecording) return;
+
+  micRecChunks = [];
+  micRecLen = 0;
+  micRecording = true;
+  micStartTs = performance.now();
+
+  micTimer && (micTimer.textContent = "00:00");
+  micTimerId = setInterval(() => {
+    micTimer && (micTimer.textContent = mmss((performance.now() - micStartTs) / 1000));
+  }, 200);
+
+  micStatus && (micStatus.textContent = "REC… fai un suono o una voce, poi STOP.");
+  setSamplerUIState();
+}
+
+function micRecStop() {
+  if (!micRecording) return;
+
+  micRecording = false;
+  if (micTimerId) {
+    clearInterval(micTimerId);
+    micTimerId = null;
   }
 
-  function micRecStart(){
-    if(!micArmed || micRecording) return;
-    micRecChunks = [];
-    micRecLen = 0;
-    micRecording = true;
-    micStartTs = performance.now();
-    micTimer && (micTimer.textContent = "00:00");
-    micTimerId = setInterval(() => {
-      micTimer && (micTimer.textContent = mmss((performance.now()-micStartTs)/1000));
-    }, 200);
+  micStatus && (
+    micStatus.textContent = micRecLen
+      ? "STOP. Premi USE AS SAMPLE."
+      : "STOP. Nessun audio registrato."
+  );
 
-    micStatus && (micStatus.textContent = "REC… fai un suono/voce, poi STOP.");
-    setSamplerUIState();
+  setSamplerUIState();
+}
+
+// =======================
+// SAMPLE BUFFER UTILS
+// =======================
+function mergeMono(chunks, total) {
+  const out = new Float32Array(total);
+  let offset = 0;
+  for (const c of chunks) {
+    out.set(c, offset);
+    offset += c.length;
   }
+  return out;
+}
 
-  function micRecStop(){
-    if(!micRecording) return;
-    micRecording = false;
-    if(micTimerId){ clearInterval(micTimerId); micTimerId = null; }
-    micStatus && (micStatus.textContent = micRecLen ? "STOP. Premi USE AS SAMPLE." : "STOP. Nessun audio registrato.");
-    setSamplerUIState();
-  }
-
-  function mergeMono(chunks, total){
-    const out = new Float32Array(total);
-    let off = 0;
-    for(const c of chunks){ out.set(c, off); off += c.length; }
-    return out;
-  }
-
-  function useAsSample(){
-    if(micRecLen === 0) return;
-    ensureAudio();
-
-    function useAsSample(){
-  if(micRecLen === 0) return;
+// =======================
+// USE AS SAMPLE (FIXED)
+// =======================
+function useAsSample() {
+  if (micRecLen === 0) return;
   ensureAudio();
+  if (!audioCtx) return;
 
   const mono = mergeMono(micRecChunks, micRecLen);
 
-  // 🔥 NORMALIZE
+  // 🔥 NORMALIZE (ESSENZIALE PER LA VOCE)
   let peak = 0;
-  for(let i=0;i<mono.length;i++){
+  for (let i = 0; i < mono.length; i++) {
     const a = Math.abs(mono[i]);
-    if(a > peak) peak = a;
+    if (a > peak) peak = a;
   }
   const gain = peak > 0 ? 0.95 / peak : 1;
-  for(let i=0;i<mono.length;i++){
+  for (let i = 0; i < mono.length; i++) {
     mono[i] *= gain;
   }
 
@@ -1223,152 +1245,64 @@
   sampleBuf = buf;
   sampleReady = true;
 
-  micStatus.textContent = "Sample caricato ✔ (normalizzato)";
+  micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva gli step SAMPLE.");
   setSamplerUIState();
 }
-    sampleReady = true;
 
-    micStatus && (micStatus.textContent = "Sample caricato ✔ Ora attiva step sulla traccia SAMPLE.");
-    setSamplerUIState();
-  }
-
-  function clearSample(){
-    sampleBuf = null;
-    sampleReady = false;
-    micStatus && (micStatus.textContent = "Sample svuotato.");
-    setSamplerUIState();
-  }
-
-  function triggerSample(when){
-    if(!sampleReady || !sampleBuf || !audioCtx) return;
-
-    const src = audioCtx.createBufferSource();
-    src.buffer = sampleBuf;
-
-    // pitch in semitones
-    const rate = Math.pow(2, pitchSemi / 12);
-    src.playbackRate.setValueAtTime(rate, when);
-
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.0001, when);
-    g.gain.exponentialRampToValueAtTime(0.95, when + 0.003);
-    g.gain.exponentialRampToValueAtTime(0.0001, when + (sampleDecayMs/1000));
-
-    const f = audioCtx.createBiquadFilter();
-    f.type = "lowpass";
-    const minF = 300, maxF = 18000;
-    const cutoff = minF + (maxF - minF) * Math.pow(sampleFilterPct, 2.1);
-    f.frequency.setValueAtTime(cutoff, when);
-    f.Q.value = 0.8;
-
-    src.connect(f);
-    f.connect(g);
-    g.connect(master);
-
-    const startOffset = sampleBuf.duration * trimStartPct;
-    const maxDur = Math.min(2.0, Math.max(0.05, sampleBuf.duration - startOffset));
-
-    src.start(when, startOffset, maxDur);
-    src.stop(when + maxDur + 0.05);
-  }
-
-  btnMicArm?.addEventListener("click", armMic);
-  btnMicRec?.addEventListener("click", micRecStart);
-  btnMicStop?.addEventListener("click", micRecStop);
-  btnUseSample?.addEventListener("click", useAsSample);
-  btnClearSample?.addEventListener("click", clearSample);
-
+function clearSample() {
+  sampleBuf = null;
+  sampleReady = false;
+  micStatus && (micStatus.textContent = "Sample svuotato.");
   setSamplerUIState();
-    // ---------- Build UI ----------
-  function buildTracksUI(){
-    elTracks.innerHTML = "";
-    TRACKS.forEach(t => {
-      const wrap = document.createElement("div");
-      wrap.className = "track";
+}
 
-      const header = document.createElement("div");
-      header.className = "trackHeader";
+// =======================
+// SAMPLE TRIGGER
+// =======================
+function triggerSample(when) {
+  if (!sampleReady || !sampleBuf || !audioCtx) return;
 
-      const name = document.createElement("div");
-      name.className = "trackName";
-      const dot = document.createElement("span");
-      dot.className = "dot " + t.cls;
-      const label = document.createElement("span");
-      label.textContent = t.name;
-      name.appendChild(dot);
-      name.appendChild(label);
+  const src = audioCtx.createBufferSource();
+  src.buffer = sampleBuf;
 
-      const mini = document.createElement("div");
-      mini.className = "btnRow";
-      const btn = document.createElement("button");
-      btn.className = "tiny";
-      btn.type = "button";
-      btn.textContent = "TRIG";
-      btn.title = "Trigger suono";
-      btn.addEventListener("click", () => {
-        ensureAudio();
-        const when = audioCtx.currentTime + 0.005;
-        triggerTrack(t.id, when);
-      });
-      mini.appendChild(btn);
+  // pitch (semitoni)
+  const rate = Math.pow(2, pitchSemi / 12);
+  src.playbackRate.setValueAtTime(rate, when);
 
-      header.appendChild(name);
-      header.appendChild(mini);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(0.95, when + 0.003);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + (sampleDecayMs / 1000));
 
-      const grid = document.createElement("div");
-      grid.className = "stepGrid";
-      grid.dataset.track = t.id;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = "lowpass";
+  const minF = 300, maxF = 18000;
+  const cutoff = minF + (maxF - minF) * Math.pow(sampleFilterPct, 2.1);
+  filter.frequency.setValueAtTime(cutoff, when);
+  filter.Q.value = 0.8;
 
-      for(let i=0;i<16;i++){
-        const s = document.createElement("div");
-        s.className = "step";
-        s.dataset.step = String(i);
-        s.addEventListener("pointerdown", (ev) => {
-          ev.preventDefault();
-          toggleStep(t.id, i);
-        });
-        grid.appendChild(s);
-      }
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
 
-      wrap.appendChild(header);
-      wrap.appendChild(grid);
-      elTracks.appendChild(wrap);
-    });
+  const startOffset = sampleBuf.duration * trimStartPct;
+  const maxDur = Math.min(2.0, Math.max(0.05, sampleBuf.duration - startOffset));
 
-    renderSteps();
-  }
+  src.start(when, startOffset, maxDur);
+  src.stop(when + maxDur + 0.05);
+}
 
-  function renderSteps(){
-    const pat = pattern[currentPat];
-    document.querySelectorAll(".stepGrid").forEach(grid => {
-      const track = grid.dataset.track;
-      const arr = pat[track];
-      [...grid.children].forEach((cell, i) => {
-        const t = TRACKS.find(x => x.id === track);
-        cell.className = "step" + (arr[i] ? " on " + (t?.cls || "") : "");
-      });
-    });
-  }
+// =======================
+// BUTTON EVENTS
+// =======================
+btnMicArm?.addEventListener("click", armMic);
+btnMicRec?.addEventListener("click", micRecStart);
+btnMicStop?.addEventListener("click", micRecStop);
+btnUseSample?.addEventListener("click", useAsSample);
+btnClearSample?.addEventListener("click", clearSample);
 
-  function flashPlayhead(step){
-    lcdStep.textContent = String(step + 1);
-    document.querySelectorAll(".stepGrid").forEach(grid => {
-      const cell = grid.children[step];
-      cell.classList.add("playhead");
-      setTimeout(() => cell.classList.remove("playhead"), 140);
-    });
-  }
-
-  function toggleStep(track, idx){
-    const pat = pattern[currentPat];
-    pat[track][idx] = !pat[track][idx];
-    renderSteps();
-
-    if(started && pat[track][idx]){
-      triggerTrack(track, audioCtx.currentTime + 0.005);
-    }
-  }
-
+setSamplerUIState();
+  
   // ---------- Sound generators ----------
   function triggerKick(when){
     const o = audioCtx.createOscillator();
