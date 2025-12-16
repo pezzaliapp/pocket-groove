@@ -1,77 +1,165 @@
 # Pocket Groove
 
-Pocket Groove è un prototipo **single-file** (un unico `index.html`) di mini groovebox / sequencer **16-step** basata su **Web Audio API**.
+**Pocket Groove** is a single-file (`index.html`) browser-based mini groovebox
+and 16-step sequencer built with the **Web Audio API**.
 
-Il progetto nasce come laboratorio di sperimentazione per pattern minimal, groove essenziali e workflow **touch-first**, direttamente nel browser.
+It is designed as a lightweight experimental playground for
+minimal patterns, essential grooves, and touch-first workflows.
 
-Tutto il codice vive in un solo file HTML.
-
----
-
-## Funzionalità
-
-- Sequencer 16-step con 5 tracce  
-  Kick · Snare · Hat · Bass · Sample (microfono)
-
-- Controlli globali  
-  BPM · Swing · Pattern A/B · Random · Groove presets
-
-- Preset locali  
-  Save · Load · Reset (localStorage)
-
-- FX XY Pad  
-  Filtro passa-basso · Stutter / Gate · Hold · Reset
-
-- Sampler da microfono  
-  ARM MIC · REC / STOP · USE AS SAMPLE  
-  Start Trim · Pitch · Filter · Decay · Monitor
-
-- Export audio  
-  Registrazione WAV dell’output post-FX
+No build system.  
+No external dependencies.  
+Everything lives in one HTML file.
 
 ---
 
-## Requisiti
+## Features
 
-Browser moderno con supporto **Web Audio API**  
-(Safari iOS / macOS, Chrome, Edge, Firefox desktop)
+### Sequencer
+- 16-step sequencer
+- 5 tracks:
+  - Kick
+  - Snare
+  - Hat
+  - Bass (mono oscillator)
+  - Sample (microphone input)
 
-Su Safari / iOS è richiesta una **gesture utente** per:
-- avviare l’audio
-- autorizzare il microfono
+### Global Controls
+- BPM
+- Swing
+- Pattern A / B
+- Clear
+- Random
+- Groove presets
+
+### Presets
+- Save
+- Load
+- Reset  
+(stored in `localStorage`)
+
+### FX
+- XY Pad:
+  - X-axis: low-pass filter
+  - Y-axis: rhythmic stutter / gate
+- Hold FX
+- Reset FX
+
+### Sampler (Microphone)
+- Arm microphone
+- Record / Stop
+- Use as sample
+- Start trim
+- Pitch
+- Filter
+- Decay
+- Monitor
+
+### WAV Export
+- Record post-FX output
+- REC / STOP / SAVE WAV
 
 ---
 
-## Avvio
+## Requirements
 
-Apri `index.html` nel browser.  
-Per funzionalità complete (microfono, AudioWorklet) è consigliato l’uso di **HTTPS o localhost**.
+A modern browser with **Web Audio API** support:
 
----
+- Safari (iOS / macOS)
+- Chrome
+- Edge
+- Firefox (desktop)
 
-## Filosofia
-
-- Single file
-- Nessuna dipendenza esterna
-- Web Audio API utilizzata in modo diretto
-- Strumento pensato per:
-  - sperimentazione
-  - prototipazione rapida
-  - studio del groove
-  - performance leggere in browser
+**Note:**  
+On Safari / iOS a user gesture is required to:
+- start audio
+- authorize microphone access
 
 ---
 
-## Licenza
+## Quick Start
 
-Questo progetto è **proprietario** e **non open source**.  
-Tutti i diritti sono riservati.
+### Option A — Open directly
 
-Vedi il file `LICENSE` per i dettagli completi.
+Open `index.html` in your browser.
+
+> Some features (microphone, AudioWorklet) may require HTTPS or `localhost`.
 
 ---
 
-## Autore
+### Option B — Local server (recommended)
 
-PezzaliAPP  
-Repository: `pocket-groove`
+From the project directory, run:
+
+```bash
+python3 -m http.server 8080
+```
+Then open in your browser:
+
+http://localhost:8080
+
+
+⸻
+
+Usage
+
+Sequencer
+	1.	Press START AUDIO
+	2.	Press PLAY
+	3.	Tap steps to program the groove
+
+Sampler
+	1.	Press ARM MIC and allow microphone access
+	2.	Press REC and record a sound or voice
+	3.	Press STOP
+	4.	Press USE AS SAMPLE
+	5.	Activate steps on the SAMPLE track
+
+WAV Export
+	1.	Go to Record WAV
+	2.	Press REC
+	3.	Press STOP
+	4.	Press SAVE WAV
+
+⸻
+
+Philosophy
+	•	Single-file architecture (index.html)
+	•	No frameworks, no dependencies
+	•	Direct use of Web Audio API
+	•	Designed for:
+	•	experimentation
+	•	rapid prototyping
+	•	groove studies
+	•	lightweight browser performances
+
+⸻
+
+Roadmap
+	•	PWA offline-ready mode
+	•	Groove & preset library
+	•	Pattern export / import (JSON)
+	•	Sample waveform view
+	•	Sample slicing
+	•	DIY hardware concept
+
+⸻
+
+License
+
+This project is licensed under the
+GNU Affero General Public License v3.0 (AGPLv3).
+
+If you modify this software and make it available over a network,
+you must provide access to the complete corresponding source code.
+
+See the LICENSE file for details.
+
+⸻
+
+Author
+
+PezzaliAPP
+Alessandro Pezzali
+Repository: pocket-groove oppure una **hero sentence artistica** subito sotto il titolo
+
+Dimmi tu. Ora la base è finalmente **pulita e solida** 🔧✨
