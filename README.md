@@ -98,8 +98,6 @@ Then open in your browser:
 http://localhost:8080
 
 
-⸻
-
 Usage
 
 Sequencer
@@ -119,8 +117,7 @@ WAV Export
 	2.	Press REC
 	3.	Press STOP
 	4.	Press SAVE WAV
-
-⸻
+___
 
 Philosophy
 	•	Single-file architecture (index.html)
@@ -132,7 +129,7 @@ Philosophy
 	•	groove studies
 	•	lightweight browser performances
 
-⸻
+___
 
 Roadmap
 	•	PWA offline-ready mode
@@ -142,7 +139,7 @@ Roadmap
 	•	Sample slicing
 	•	DIY hardware concept
 
-⸻
+____
 
 License
 
@@ -154,12 +151,10 @@ you must provide access to the complete corresponding source code.
 
 See the LICENSE file for details.
 
-⸻
+___
 
 Author
 
 PezzaliAPP
 Alessandro Pezzali
-Repository: pocket-groove oppure una **hero sentence artistica** subito sotto il titolo
-
-Dimmi tu. Ora la base è finalmente **pulita e solida** 🔧✨
+Repository: pocket-groove
